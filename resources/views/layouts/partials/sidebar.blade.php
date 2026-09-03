@@ -27,7 +27,7 @@
                     ['label' => 'Dashboard',   'route' => 'dashboard.index',  'icon' => 'home'],
                     ['label' => 'Usuarios',    'route' => 'usuario.index',      'icon' => 'users'],
                     ['label' => 'Perfiles/Roles', 'route' => 'roles.index',   'icon' => 'shield'],
-                    ['label' => 'Categorías',  'route' => 'categories.index', 'icon' => 'tag'],
+                    ['label' => 'Mascotas',  'route' => 'mascota.index', 'icon' => 'heart-pulse'],
                     ['label' => 'Productos',   'route' => 'producto.index',   'icon' => 'box'],
                     ['label' => 'Reportes',    'route' => 'reports.index',    'icon' => 'chart'],
                     ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'cog'],
