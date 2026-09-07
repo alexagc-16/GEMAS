@@ -13,4 +13,8 @@ class Mascota extends Model
     public function Usuario(){
         return $this->belongsTo(Usuario::class, 'idUsuario');
     }
+
+    public function HistoriaClinica(){
+        return $this->hasOne(HistoriaClinica::class);
+    }
 }

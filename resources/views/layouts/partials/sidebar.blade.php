@@ -28,7 +28,7 @@
                     ['label' => 'Usuarios',    'route' => 'usuario.index',      'icon' => 'users'],
                     ['label' => 'Perfiles/Roles', 'route' => 'roles.index',   'icon' => 'shield'],
                     ['label' => 'Mascotas',  'route' => 'mascota.index', 'icon' => 'heart-pulse'],
-                    ['label' => 'Productos',   'route' => 'producto.index',   'icon' => 'box'],
+                    ['label' => 'Historia Clinica',   'route' => 'historiaclinica.index',   'icon' => 'box'],
                     ['label' => 'Reportes',    'route' => 'reports.index',    'icon' => 'chart'],
                     ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'cog'],
                 ];
