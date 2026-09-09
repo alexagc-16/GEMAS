@@ -16,14 +16,14 @@
             <div class="flex justify-between items-center mb-6">
 
                 <h2 class="text-2xl font-bold text-gray-700">
-                    Listado de Historias clinicas
+                    Listado de Historias Clinicas
                 </h2>
 
-                <a href="{{ route('historiaclinica.create') }}"
-                class="rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 transition">
-
-                    Nueva Historia Clinica
-
+                <a href="{{ route('historiaclinica.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 transition">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Nueva Historia Clinica
                 </a>
 
             </div>
@@ -58,97 +58,109 @@
 
             @endif
 
-            <table class="min-w-full border border-gray-300">
+            <div class="overflow-x-auto">
 
-                <thead class="bg-gray-200">
+                <table class="min-w-full border border-gray-300">
 
-                    <tr>
+                    <thead class="bg-gray-200">
 
-                        <th class="border px-4 py-2">
-                            ID
-                        </th>
+                        <tr>
 
-                        <th class="border px-4 py-2">
-                            Fecha de Apertura
-                        </th>
+                            <th class="border px-4 py-2">
+                                ID
+                            </th>
 
-                        <th class="border px-4 py-2">
-                            Antecedentes
-                        </th>
+                            <th class="border px-4 py-2">
+                                Fecha de Apertura
+                            </th>
 
-                        <th class="border px-4 py-2">
-                            Alergias
-                        </th>
+                            <th class="border px-4 py-2">
+                                Antecedentes
+                            </th>
 
-                        <th class="border px-4 py-2">
-                            Enfermedades Previas
-                        </th>
+                            <th class="border px-4 py-2">
+                                Alergias
+                            </th>
 
-                        <th class="border px-4 py-2">
-                            Observaciones
-                        </th>
+                            <th class="border px-4 py-2">
+                                Enfermedades Previas
+                            </th>
 
-                        <th class="border px-4 py-2">
-                            Mascota
-                        </th>
+                            <th class="border px-4 py-2">
+                                Observaciones
+                            </th>
 
-                        <th class="border px-4 py-2">
-                            Acciones
-                        </th>
+                            <th class="border px-4 py-2">
+                                Mascota
+                            </th>
 
-                    </tr>
+                            <th class="border px-4 py-2">
+                                Acciones
+                            </th>
 
-                </thead>
-
-                <tbody>
-
-                    @foreach ($historiasClinicas as $historiaClinica)
-
-                        <tr class="text-center hover:bg-gray-50">
-                            <td class="border px-4 py-2">{{ $historiaClinica->id }}</td>
-                            <td class="border px-4 py-2">{{ $historiaClinica->fechaApertura}}</td>
-                            <td class="border px-4 py-2">{{ $historiaClinica->antecedentes}}</td>
-                            <td class="border px-4 py-2">{{ $historiaClinica->alergias}}</td>
-                            <td class="border px-4 py-2">{{ $historiaClinica->enfermedadesPrevias}}</td>
-                            <td class="border px-4 py-2">{{ $historiaClinica->observaciones}}</td>
-                            <td class="border px-4 py-2">{{ $historiaClinica->Mascota->nombre}}</td>
-                            
-                            <td class="border px-4 py-2">
-                                <a href="{{ route('historiaclinica.edit',$historiaClinica->id) }}"class="bg-blue-400 hover:bg-blue-600 text-white rounded px-2 py-2">Editar</a>
-                                
-                                <form action="{{ route('historiaclinica.destroy', $historiaClinica->id)}}" method="post">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="bg-red-400 hover:bg-red-600 text-white rounded px-2 py-2">Eliminar</button>
-                                </form>
-                                
-
-
-                            </td>
                         </tr>
-                        
-                    @endforeach
 
-                    @if ($historiasClinicas->isEmpty())
+                    </thead>
 
-                    <tr>
+                    <tbody>
 
-                        <td colspan="8" class="border px-4 py-6 text-center text-gray-500">
-                            No hay historias clinicas registradas.
-                        </td>
+                        @foreach ($historiasClinicas as $historiaClinica)
 
-                    </tr>
+                            <tr class="text-center hover:bg-gray-50">
+                                <td class="border px-4 py-2">{{ $historiaClinica->id }}</td>
+                                <td class="border px-4 py-2">{{ $historiaClinica->fechaApertura}}</td>
+                                <td class="border px-4 py-2">{{ $historiaClinica->antecedentes}}</td>
+                                <td class="border px-4 py-2">{{ $historiaClinica->alergias}}</td>
+                                <td class="border px-4 py-2">{{ $historiaClinica->enfermedadesPrevias}}</td>
+                                <td class="border px-4 py-2">{{ $historiaClinica->observaciones}}</td>
+                                <td class="border px-4 py-2">{{ $historiaClinica->Mascota->nombre}}</td>
+                                
+                                <td class="border px-4 py-2">
+                                    <div class="flex items-center justify-center gap-3">
+                                    <a href="{{ route('historiaclinica.edit', $historiaClinica->id) }}" class="text-blue-600 hover:text-blue-900 p-1" title="Editar">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </a>
 
-                    @endif
+                                    <!-- Botón Eliminar -->
+                                    <form action="" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar esta historia clinica?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900 p-1" title="Eliminar">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </td>
+
+                            </tr>
+                            
+                        @endforeach
+
+                        @if ($historiasClinicas->isEmpty())
+
+                        <tr>
+
+                            <td colspan="8" class="border px-4 py-6 text-center text-gray-500">
+                                No hay historias clinicas registradas.
+                            </td>
+
+                        </tr>
+
+                        @endif
 
 
-                </tbody>
+                    </tbody>
 
-                
-                
-                
+                    
+                    
+                    
 
-            </table>
+                </table>
+
+            </div>
 
         </div>
 
