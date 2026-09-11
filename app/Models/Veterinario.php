@@ -9,4 +9,8 @@ class Veterinario extends Model
     protected $table= 'veterinario';
 
     protected $fillable = ['nombre', 'apellido', 'documentoIdentidad', 'telefono', 'correo', 'especialidad'];
+
+    public function Horario(){
+        return $this->hasMany(Horario::class);
+    }
 }
