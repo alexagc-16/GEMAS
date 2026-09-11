@@ -30,7 +30,7 @@
                     ['label' => 'Mascotas',  'route' => 'mascota.index', 'icon' => 'heart-pulse'],
                     ['label' => 'Historia Clinica',   'route' => 'historiaclinica.index',   'icon' => 'box'],
                     ['label' => 'Servicios',    'route' => 'servicio.index',    'icon' => 'chart'],
-                    //['label' => 'Veterinarios', 'route' => 'veterinario.index', 'icon' => 'cog'],
+                    ['label' => 'Veterinarios', 'route' => 'veterinario.index', 'icon' => 'cog'],
                 ];
             @endphp
 
