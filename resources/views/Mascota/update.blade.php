@@ -59,8 +59,8 @@
                 <div class="mb-5">
                     <label for="" class="block mb-2 font-semibold">Sexo</label>
                     <select name="sexo" id="sexo" value="{{ $mascota->sexo}}" class="w-full border rounded px-3 py-2">
-                        <option value="1" {{$mascota->sexo == 1 ? 'selected':' ';}}>Macho</option>
-                        <option value="0" {{$mascota->sexo == 0 ? 'selected':' ';}}>Hembra</option>
+                        <option value="Macho" {{$mascota->sexo == 'Macho' ? 'selected':' ';}}>Macho</option>
+                        <option value="Hembra" {{$mascota->sexo == 'Hembra' ? 'selected':' ';}}>Hembra</option>
                     </select>
                 </div>
 

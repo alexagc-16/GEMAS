@@ -63,8 +63,8 @@
                 <div class="mb-5">
                     <label for="" class="block mb-2 font-semibold">Sexo</label>
                     <select name="sexo" id="sexo" class="w-full border rounded px-3 py-2">
-                        <option value="1">Macho</option>
-                        <option value="0">Hembra</option>
+                        <option value="Macho">Macho</option>
+                        <option value="Hembra">Hembra</option>
                     </select>
                 </div>
 
