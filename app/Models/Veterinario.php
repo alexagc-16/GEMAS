@@ -13,4 +13,8 @@ class Veterinario extends Model
     public function Horario(){
         return $this->hasMany(Horario::class);
     }
+
+    public function Cita(){
+        return $this->hasMany(Cita::class);
+    }
 }

@@ -17,4 +17,8 @@ class Mascota extends Model
     public function HistoriaClinica(){
         return $this->hasOne(HistoriaClinica::class);
     }
+
+    public function Cita(){
+        return $this->hasMany(Cita::class);
+    }
 }

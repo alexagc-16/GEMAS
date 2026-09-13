@@ -9,4 +9,8 @@ class Servicio extends Model
     protected $table = 'servicio';
 
     protected $fillable = ['nombre', 'descripcion'];
+
+    public function Cita(){
+        return $this->hasMany(Cita::class);
+    }
 }

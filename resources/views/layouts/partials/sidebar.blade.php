@@ -32,6 +32,7 @@
                     ['label' => 'Servicios',    'route' => 'servicio.index',    'icon' => 'chart'],
                     ['label' => 'Veterinarios', 'route' => 'veterinario.index', 'icon' => 'cog'],
                     ['label' => 'Horarios', 'route' => 'horario.index', 'icon' => 'cog'],
+                    ['label' => 'Citas', 'route' => 'cita.index', 'icon' => 'cog'],
                 ];
             @endphp
 

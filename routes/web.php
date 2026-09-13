@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CitaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HistoriaClinicaController;
@@ -18,3 +19,4 @@ Route::resource('historiaclinica', HistoriaClinicaController::class);
 Route::resource('servicio', ServicioController::class);
 Route::resource('veterinario', VeterinarioController::class);
 Route::resource('horario', HorarioController::class);
+Route::resource('cita', CitaController::class);
