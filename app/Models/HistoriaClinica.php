@@ -13,4 +13,8 @@ class HistoriaClinica extends Model
     public function Mascota(){
         return $this->belongsTo(Mascota::class, 'idMascota');
     }
+
+    public function Evolucion(){
+        return $this->hasMany(Evolucion::class);
+    }
 }
