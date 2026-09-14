@@ -123,7 +123,7 @@
                                 <td class="border px-4 py-2">{{ $mascota->sexo}}</td>
                                 <td class="border px-4 py-2">{{ $mascota->fechaNacimiento}}</td>
                                 <td class="border px-4 py-2">{{ $mascota->color}}</td>
-                                <td class="border px-4 py-2">{{ $mascota->peso}}</td>
+                                <td class="border px-4 py-2">{{ $mascota->peso}} kg</td>
                                 <td class="border px-4 py-2">{{ $mascota->Usuario->nombre}}</td>
                                 
                                 <td class="border px-4 py-2">

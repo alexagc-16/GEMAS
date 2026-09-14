@@ -114,11 +114,11 @@
                             <tr class="text-center hover:bg-gray-50">
                                 <td class="border px-4 py-2">{{ $evolucion->id }}</td>
                                 <td class="border px-4 py-2">{{ $evolucion->fecha}}</td>
-                                <td class="border px-4 py-2">{{ $evolucion->peso}}</td>
-                                <td class="border px-4 py-2">{{ $evolucion->temperatura}}</td>
+                                <td class="border px-4 py-2">{{ $evolucion->peso}} kg</td>
+                                <td class="border px-4 py-2">{{ $evolucion->temperatura}} ºC</td>
                                 <td class="border px-4 py-2">{{ $evolucion->sintomas}}</td>
                                 <td class="border px-4 py-2">{{ $evolucion->observaciones}}</td>
-                                <td class="border px-4 py-2">{{ $evolucion->HistoriaClinica->id}}</td>
+                                <td class="border px-4 py-2"># {{ $evolucion->HistoriaClinica->id}}</td>
                                 <td class="border px-4 py-2">{{ $evolucion->Veterinario->nombre}}</td>
                                 
                                 <td class="border px-4 py-2">
