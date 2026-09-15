@@ -105,7 +105,7 @@
                                     </a>
 
                                     <!-- Botón Eliminar -->
-                                    <form action="" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este servicio?');">
+                                    <form action="{{ route('servicio.destroy', $servicio->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este servicio?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900 p-1" title="Eliminar">

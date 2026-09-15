@@ -135,7 +135,7 @@
                                     </a>
 
                                     <!-- Botón Eliminar -->
-                                    <form action="" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar esta mascota?');">
+                                    <form action="{{ route('mascota.destroy', $mascota->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar esta mascota?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900 p-1" title="Eliminar">

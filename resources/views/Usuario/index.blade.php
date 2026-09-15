@@ -125,7 +125,7 @@
                                     </a>
 
                                     <!-- Botón Eliminar -->
-                                    <form action="" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
+                                    <form action="{{ route('usuario.destroy', $usuario->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900 p-1" title="Eliminar">
