@@ -16,4 +16,8 @@ class Evolucion extends Model
     public function Veterinario(){
         return $this->belongsTo(Veterinario::class, 'idVeterinario');
     }
+
+    public function DiagnosticoTratamiento(){
+        return $this->hasMany(DiagnosticoTratamiento::class);
+    }
 }

@@ -34,6 +34,7 @@
                     ['label' => 'Horarios', 'route' => 'horario.index', 'icon' => 'cog'],
                     ['label' => 'Citas', 'route' => 'cita.index', 'icon' => 'cog'],
                     ['label' => 'Evoluciones', 'route' => 'evolucion.index', 'icon' => 'cog'],
+                    ['label' => 'Diagnosticos y Tratamientos', 'route' => 'diagnosticotratamiento.index', 'icon' => 'cog'],
                 ];
             @endphp
 

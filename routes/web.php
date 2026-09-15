@@ -3,6 +3,7 @@
 use App\Http\Controllers\CitaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiagnosticoTratamientoController;
 use App\Http\Controllers\EvolucionController;
 use App\Http\Controllers\HistoriaClinicaController;
 use App\Http\Controllers\HorarioController;
@@ -22,3 +23,4 @@ Route::resource('veterinario', VeterinarioController::class);
 Route::resource('horario', HorarioController::class);
 Route::resource('cita', CitaController::class);
 Route::resource('evolucion', EvolucionController::class);
+Route::resource('diagnosticotratamiento', DiagnosticoTratamientoController::class);
