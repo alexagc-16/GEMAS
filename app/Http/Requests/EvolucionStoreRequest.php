@@ -26,8 +26,8 @@ class EvolucionStoreRequest extends FormRequest
             'fecha' => 'required|date',
             'peso' => 'required|numeric',
             'temperatura' => 'required|numeric',
-            'sintomas' => 'required|string|max:255',
-            'observaciones' => 'required|string|max:255',
+            'sintomas' => 'required|string',
+            'observaciones' => 'required|string',
             'idHistoriaClinica' => 'required|exists:historiaClinica,id',
             'idVeterinario' => 'required|exists:veterinario,id',
         ];
@@ -43,10 +43,8 @@ class EvolucionStoreRequest extends FormRequest
             'temperatura.required' => 'La temperatura es obligatoria.',
 
             'sintomas.required' => 'Los síntomas son obligatorios.',
-            'sintomas.max' => 'Los síntomas no pueden superar los 255 caracteres.',
 
             'observaciones.required' => 'Las observaciones son obligatorias.',
-            'observaciones.max' => 'Las observaciones no pueden superar los 255 caracteres.',
 
             'idHistoriaClinica.required' => 'La historia clínica es obligatoria.',
             'idHistoriaClinica.exists' => 'La historia clínica seleccionada no existe.',

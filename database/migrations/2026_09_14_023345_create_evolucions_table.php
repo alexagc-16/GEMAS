@@ -16,8 +16,8 @@ return new class extends Migration
             $table->date('fecha');
             $table->decimal('peso',10,2);
             $table->decimal('temperatura',10,2);
-            $table->string('sintomas');
-            $table->string('observaciones');
+            $table->text('sintomas');
+            $table->text('observaciones');
             $table->unsignedBigInteger('idHistoriaClinica');
             $table->unsignedBigInteger('idVeterinario');
             $table->foreign('idHistoriaClinica')->references('id')->on('historiaClinica');

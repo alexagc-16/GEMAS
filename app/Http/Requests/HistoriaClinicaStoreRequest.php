@@ -24,10 +24,10 @@ class HistoriaClinicaStoreRequest extends FormRequest
     {
         return [
             'fechaApertura' => 'required|date',
-            'antecedentes' => 'required|string|max:255',
-            'alergias' => 'required|string|max:255',
-            'enfermedadesPrevias' => 'required|string|max:255',
-            'observaciones' => 'required|string|max:255',
+            'antecedentes' => 'required|string',
+            'alergias' => 'required|string',
+            'enfermedadesPrevias' => 'required|string',
+            'observaciones' => 'required|string',
             'idMascota' => 'required|exists:mascota,id',
         ];
     }
@@ -39,16 +39,12 @@ class HistoriaClinicaStoreRequest extends FormRequest
             'fechaApertura.date' => 'La fecha de apertura debe tener un formato válido.',
 
             'antecedentes.required' => 'Los antecedentes son obligatorios.',
-            'antecedentes.max' => 'Los antecedentes no pueden superar los 255 caracteres.',
 
             'alergias.required' => 'Las alergias son obligatorias.',
-            'alergias.max' => 'Las alergias no pueden superar los 255 caracteres.',
 
             'enfermedadesPrevias.required' => 'Las enfermedades previas son obligatorias.',
-            'enfermedadesPrevias.max' => 'Las enfermedades previas no pueden superar los 255 caracteres.',
 
             'observaciones.required' => 'Las observaciones son obligatorias.',
-            'observaciones.max' => 'Las observaciones no pueden superar los 255 caracteres.',
 
             'idMascota.required' => 'La mascota es obligatoria.',
             'idMascota.exists' => 'La mascota seleccionada no existe.',

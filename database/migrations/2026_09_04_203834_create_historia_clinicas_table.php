@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('historiaClinica', function (Blueprint $table) {
             $table->id();
             $table->date('fechaApertura');
-            $table->string('antecedentes');
-            $table->string('alergias');
-            $table->string('enfermedadesPrevias');
-            $table->string('observaciones');
+            $table->text('antecedentes');
+            $table->text('alergias');
+            $table->text('enfermedadesPrevias');
+            $table->text('observaciones');
             $table->unsignedBigInteger('idMascota');
             $table->foreign('idMascota')->references('id')->on('mascota');
             $table->timestamps();
