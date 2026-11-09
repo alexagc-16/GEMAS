@@ -22,14 +22,30 @@ class MascotaStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+        $usuario = $this->user();
+
+        // Si un usuario está editando una mascota,
+        // solo se validan los campos de la fotografía.
+        if (
+            $this->isMethod('put') &&
+            $usuario &&
+            $usuario->tieneRolActivo('usuario')
+        ) {
+            return [
+                'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'eliminar_imagen' => 'nullable|in:0,1',
+            ];
+        }
+
         return [
-            'nombre' => 'required|string|max:50', 
-            'especie' => 'required|string|max:50', 
-            'raza' => 'required|string|max:50', 
-            'sexo' => 'required|string', 
-            'fechaNacimiento' => 'required|date', 
-            'color' => 'required|string|max:50', 
-            'peso' => 'required|numeric', 
+            'nombre' => 'required|string|max:50',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'especie' => 'required|string|max:50',
+            'raza' => 'required|string|max:50',
+            'sexo' => 'required|string',
+            'fechaNacimiento' => 'required|date',
+            'color' => 'required|string|max:50',
+            'peso' => 'required|numeric',
             'idUsuario' => 'required|exists:usuario,id',
         ];
     }
@@ -39,6 +55,9 @@ class MascotaStoreRequest extends FormRequest
         return [ 
             'nombre.required' => 'El nombre de la mascota es obligatorio.', 
             'nombre.max' => 'El nombre de la mascota no puede superar los 50 caracteres.', 
+            'imagen.image' => 'El archivo debe ser una imagen.',
+            'imagen.mimes' => 'La imagen debe estar en formato JPG, JPEG, PNG o WEBP.',
+            'imagen.max' => 'La imagen no puede superar los 2 MB.',
             'especie.required' => 'La especie es obligatoria.', 
             'especie.max' => 'La especie no puede superar los 50 caracteres.', 
             'raza.required' => 'La raza es obligatoria.', 
