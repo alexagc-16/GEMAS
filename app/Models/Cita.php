@@ -22,4 +22,8 @@ class Cita extends Model
         return $this->belongsTo(Servicio::class, 'idServicio');
     }
 
+    public function CancelacionCita(){
+        return $this->hasOne(CancelacionCita::class, 'idCita');
+    }
+
 }

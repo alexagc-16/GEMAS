@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('fecha');
             $table->time('hora');
             $table->string('motivo');
-            $table->enum('estado', ['Pendiente', 'Confirmada', 'Atendida', 'Cancelada']);
+            $table->enum('estado', ['Pendiente', 'Confirmada', 'En atención', 'Atendida', 'Cancelada', 'No asistió']);
             $table->unsignedBigInteger('idMascota');
             $table->unsignedBigInteger('idVeterinario');
             $table->unsignedBigInteger('idServicio');
