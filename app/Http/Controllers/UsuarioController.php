@@ -19,7 +19,7 @@ class UsuarioController extends Controller
    
     public function index()
     {
-        $usuarios = $this->usuario_service->listartodo();
+        $usuarios = $this->usuario_service->listarPaginado(10);
         return view('Usuario.index', compact('usuarios'));
     }
 

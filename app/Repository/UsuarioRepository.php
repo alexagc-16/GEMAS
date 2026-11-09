@@ -5,13 +5,17 @@ use App\Models\Usuario;
 
 class UsuarioRepository{
 
+    public function listarPaginado(int $porPagina = 10){
+        return Usuario::latest()->paginate($porPagina);
+    }
+
     public function listartodo(){
         return Usuario::all();
     }
 
     public function store(array $datos)
     {
-        Usuario::create($datos);
+        return Usuario::create($datos);
     }
 
     public function edit(int $id)

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UsuarioStoreRequest extends FormRequest
 {
@@ -22,13 +23,28 @@ class UsuarioStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+        $esCreacion = $this->isMethod('post');
+
         return [
             'nombre' => 'required|string|max:50',
             'apellido' => 'required|string|max:50',
             'documentoIdentidad' => 'required|string|max:15',
             'telefono' => 'required|string|max:15',
-            'correo' => 'required|string|max:50',
-            'direccion' => 'required|string|max:50',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:50', 
+                Rule::unique('usuario', 'email')->ignore($this->route('id')),
+            ],
+            'direccion' => 'nullable|string|max:50',
+            'password' => [
+                $esCreacion ? 'required' : 'nullable',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/',
+                'confirmed',
+            ],
         ];
     }
 
@@ -47,12 +63,18 @@ class UsuarioStoreRequest extends FormRequest
             'telefono.required' => 'El teléfono es obligatorio.',
             'telefono.max' => 'El teléfono no puede superar los 15 caracteres.',
 
-            'correo.required' => 'El correo electrónico es obligatorio.',
-            'correo.max' => 'El correo electrónico no puede superar los 50 caracteres.',
-            'correo.email' => 'El correo electrónico debe tener un formato válido.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.max' => 'El correo electrónico no puede superar los 50 caracteres.',
+            'email.email' => 'El correo electrónico debe tener un formato válido.',
+            'email.unique' => 'Este correo electrónico ya se encuentra registrado.',
 
-            'direccion.required' => 'La dirección es obligatoria.',
-            'direccion.max' => 'La dirección no puede superar los 50 caracteres.',
+            'direccion.string' => 'La dirección debe ser un texto válido.',
+            'direccion.max' => 'La dirección no puede superar los 255 caracteres.',
+
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.regex' => 'La contraseña debe incluir al menos una mayúscula, una minúscula, un número y un carácter especial.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
         ];
     }
 }
