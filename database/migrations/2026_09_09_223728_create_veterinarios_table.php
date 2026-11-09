@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->string('apellido');
-            $table->string('documentoIdentidad');
+            $table->string('documentoIdentidad')->unique();;
             $table->string('telefono');
-            $table->string('correo');
+            $table->string('email')->unique();
             $table->string('especialidad');
             $table->timestamps();
         });

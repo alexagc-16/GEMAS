@@ -5,6 +5,10 @@ use App\Models;
 use App\Models\Veterinario;
 
 class VeterinarioRepository{
+
+    public function listarPaginado(int $porPagina = 10){
+        return Veterinario::latest()->paginate($porPagina);
+    }
     
     public function listartodo(){
         return Veterinario::all();
@@ -12,7 +16,7 @@ class VeterinarioRepository{
     
     public function store( array $datos)
     {
-        Veterinario::create($datos);
+        return Veterinario::create($datos);
     }
 
     public function edit(int $id)
