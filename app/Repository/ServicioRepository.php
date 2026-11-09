@@ -6,6 +6,10 @@ use App\Models\Servicio;
 
 class ServicioRepository{
 
+    public function listarPaginado(int $porPagina = 10){
+        return Servicio::latest()->paginate($porPagina);
+    }
+
     public function listarTodo(){
         return Servicio::all();
     }

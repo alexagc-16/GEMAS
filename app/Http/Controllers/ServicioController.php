@@ -18,7 +18,7 @@ class ServicioController extends Controller
     
     public function index()
     {
-        $servicios = $this->servicio_service->listarTodo();
+        $servicios = $this->servicio_service->listarPaginado(10);
         return view('Servicio.index', compact('servicios'));
     }
 

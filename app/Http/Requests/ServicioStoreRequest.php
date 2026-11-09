@@ -25,6 +25,7 @@ class ServicioStoreRequest extends FormRequest
         return [
             'nombre' => 'required|string|max:100',
             'descripcion' => 'required|string|max:255',
+            'duracionMinutos' => 'required|integer|min:1|max:240',
         ];
     }
 
@@ -36,6 +37,11 @@ class ServicioStoreRequest extends FormRequest
 
             'descripcion.required' => 'La descripción del servicio es obligatoria.',
             'descripcion.max' => 'La descripción del servicio no puede superar los 255 caracteres.',
+
+            'duracionMinutos.required' => 'La duración del servicio es obligatoria.',
+            'duracionMinutos.integer' => 'La duración debe ser un número entero.',
+            'duracionMinutos.min' => 'La duración debe ser de al menos 1 minuto.',
+            'duracionMinutos.max' => 'La duración no puede superar las 4 horas (240 minutos).',
         ];
     }
 }

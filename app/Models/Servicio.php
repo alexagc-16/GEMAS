@@ -8,7 +8,7 @@ class Servicio extends Model
 {
     protected $table = 'servicio';
 
-    protected $fillable = ['nombre', 'descripcion'];
+    protected $fillable = ['nombre', 'descripcion', 'duracionMinutos'];
 
     public function Cita(){
         return $this->hasMany(Cita::class);

@@ -13,6 +13,10 @@ class ServicioService{
         $this->servicio_repository = $serviciorepository;
     }
 
+    public function listarPaginado(int $porPagina = 10){
+        return $this->servicio_repository->listarPaginado($porPagina);
+    }
+
     public function listarTodo(){
         return $this->servicio_repository->listarTodo();
     }
