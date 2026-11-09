@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class HistoriaClinicaStoreRequest extends FormRequest
 {
@@ -23,21 +24,16 @@ class HistoriaClinicaStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'fechaApertura' => 'required|date',
             'antecedentes' => 'required|string',
             'alergias' => 'required|string',
             'enfermedadesPrevias' => 'required|string',
             'observaciones' => 'required|string',
-            'idMascota' => 'required|exists:mascota,id',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'fechaApertura.required' => 'La fecha de apertura es obligatoria.',
-            'fechaApertura.date' => 'La fecha de apertura debe tener un formato válido.',
-
             'antecedentes.required' => 'Los antecedentes son obligatorios.',
 
             'alergias.required' => 'Las alergias son obligatorias.',
@@ -45,9 +41,6 @@ class HistoriaClinicaStoreRequest extends FormRequest
             'enfermedadesPrevias.required' => 'Las enfermedades previas son obligatorias.',
 
             'observaciones.required' => 'Las observaciones son obligatorias.',
-
-            'idMascota.required' => 'La mascota es obligatoria.',
-            'idMascota.exists' => 'La mascota seleccionada no existe.',
         ];
     }
 }

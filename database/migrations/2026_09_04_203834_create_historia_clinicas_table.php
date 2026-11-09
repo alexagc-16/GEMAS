@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('historiaClinica', function (Blueprint $table) {
             $table->id();
             $table->date('fechaApertura');
-            $table->text('antecedentes');
-            $table->text('alergias');
-            $table->text('enfermedadesPrevias');
-            $table->text('observaciones');
-            $table->unsignedBigInteger('idMascota');
+            $table->text('antecedentes')->nullable();
+            $table->text('alergias')->nullable();
+            $table->text('enfermedadesPrevias')->nullable();
+            $table->text('observaciones')->nullable();
+            $table->unsignedBigInteger('idMascota')->unique();;
             $table->foreign('idMascota')->references('id')->on('mascota');
+            $table->timestamp('completadaEn')->nullable();
             $table->timestamps();
         });
     }

@@ -7,6 +7,8 @@ use App\Models\HistoriaClinica;
 use App\Services\HistoriaClinicaService;
 use App\Services\MascotaService;
 use Illuminate\Http\Request;
+use App\Models\Usuario;
+use Illuminate\Support\Facades\Auth;
 
 class HistoriaClinicaController extends Controller
 {
@@ -21,15 +23,25 @@ class HistoriaClinicaController extends Controller
     
     public function index()
     {
-        $historiasClinicas = $this->historia_clinica_service->listartodo();
+        /** @var Usuario $usuario */
+        $usuario = Auth::user();
+
+        if ($usuario->tieneRolActivo('usuario')) {
+            $historiasClinicas = $this->historia_clinica_service
+                ->listarPaginadoPorUsuario($usuario->id, 10);
+        } else {
+            $historiasClinicas = $this->historia_clinica_service
+                ->listarPaginado(10);
+        }
+
         return view('HistoriaClinica.index', compact('historiasClinicas'));
-        
     }
     
     public function create()
     {
-        $mascotas = $this->mascota_service->listartodo();
-        return view('HistoriaClinica.create', compact('mascotas'));
+        $historiasClinicas = $this->historia_clinica_service->listarPendientes();
+
+        return view('HistoriaClinica.create', compact('historiasClinicas'));
     }
 
     public function store(HistoriaClinicaStoreRequest $request)
@@ -46,13 +58,20 @@ class HistoriaClinicaController extends Controller
     public function edit(int $id)
     {
         $historiaClinica = $this->historia_clinica_service->edit($id);
-        $mascotas = $this->mascota_service->listartodo();
-        return view('HistoriaClinica.update', compact('historiaClinica', 'mascotas'));
+
+        // Evitar modificar una historia clínica ya completada
+        if ($historiaClinica->completadaEn !== null) {
+            return redirect()
+                ->route('historiaclinica.index')
+                ->with('error', 'Esta historia clínica ya fue completada y no se puede modificar.');
+        }
+
+        return view('HistoriaClinica.update', compact('historiaClinica'));
     }
 
     public function update(int $id, HistoriaClinicaStoreRequest $request)
     {
-        $this->historia_clinica_service->update($id, $request->all());
+        $this->historia_clinica_service->update($id, $request->validated());
         return redirect()->route('historiaclinica.index')->with('update', 'Historia clinica actualizada correctamente');
     }
 
@@ -62,3 +81,4 @@ class HistoriaClinicaController extends Controller
         return redirect()->route('historiaclinica.index')->with('destroy', 'Historia clinica eliminada correctamente');
     }
 }
+

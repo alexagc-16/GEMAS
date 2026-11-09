@@ -5,13 +5,54 @@ use App\Models\HistoriaClinica;
 
 class HistoriaClinicaRepository{
 
+    public function listarPaginado(int $porPagina = 10)
+    {
+        return HistoriaClinica::with([
+            'Mascota',
+            'Evolucion.Veterinario',
+            'Evolucion.DiagnosticoTratamiento'
+        ])
+            ->latest()
+            ->paginate($porPagina);
+    }
+
+    public function listarPaginadoPorUsuario(int $idUsuario, int $porPagina = 10)
+    {
+        return HistoriaClinica::with([
+            'Mascota',
+            'Evolucion.Veterinario',
+            'Evolucion.DiagnosticoTratamiento'
+        ])
+            ->whereHas('Mascota', function ($consulta) use ($idUsuario) {
+                $consulta->where('idUsuario', $idUsuario);
+            })
+            ->latest()
+            ->paginate($porPagina);
+    }
+
     public function listartodo(){
-        return HistoriaClinica::with('Mascota')->get();
+        return HistoriaClinica::with('Mascota', 'Evolucion.Veterinario','Evolucion.DiagnosticoTratamiento')->get();
+    }
+
+    public function listarPendientes()
+    {
+        return HistoriaClinica::with('Mascota')
+            ->whereNull('completadaEn')
+            ->get();
+    }
+
+    public function buscarParaConsulta(int $id)
+    {
+        return HistoriaClinica::with([
+            'Mascota',
+            'Evolucion.Veterinario',
+            'Evolucion.DiagnosticoTratamiento',
+        ])->where('idMascota', $id)->firstOrFail();
     }
 
     public function store(array $datos)
     {
-        HistoriaClinica::create($datos);
+        return HistoriaClinica::create($datos);
     }
 
     public function edit(int $id)
@@ -29,5 +70,4 @@ class HistoriaClinicaRepository{
     {
         HistoriaClinica::destroy($id);
     }
-
 }
