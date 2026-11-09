@@ -23,11 +23,10 @@ class EvolucionStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'fecha' => 'required|date',
-            'peso' => 'required|numeric',
-            'temperatura' => 'required|numeric',
-            'sintomas' => 'required|string',
-            'observaciones' => 'required|string',
+            'peso' => 'required|numeric|gt:0',
+            'temperatura' => 'required|numeric|gt:0',
+            'sintomas' => 'required|string|max:1000',
+            'observaciones' => 'required|string|max:1000',
             'idHistoriaClinica' => 'required|exists:historiaClinica,id',
             'idVeterinario' => 'required|exists:veterinario,id',
         ];
@@ -36,11 +35,13 @@ class EvolucionStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'fecha.required' => 'La fecha de la evolución es obligatoria.',
-
             'peso.required' => 'El peso es obligatorio.',
+            'peso.numeric' => 'El peso debe ser un valor numérico.',
+            'peso.gt' => 'El peso debe ser mayor que cero.',
 
             'temperatura.required' => 'La temperatura es obligatoria.',
+            'temperatura.numeric' => 'La temperatura debe ser un valor numérico.',
+            'temperatura.gt' => 'La temperatura debe ser mayor que cero.',
 
             'sintomas.required' => 'Los síntomas son obligatorios.',
 

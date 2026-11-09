@@ -18,6 +18,6 @@ class Evolucion extends Model
     }
 
     public function DiagnosticoTratamiento(){
-        return $this->hasMany(DiagnosticoTratamiento::class);
+        return $this->hasMany(DiagnosticoTratamiento::class, 'idEvolucion');
     }
 }

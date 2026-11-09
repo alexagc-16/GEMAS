@@ -15,7 +15,7 @@ class EvolucionController extends Controller
     private HistoriaClinicaService $historia_clinica_service;
     private VeterinarioService $veterinario_service;
 
-    public function __construct(EvolucionService $evolucionservice, private HistoriaClinicaService $historiaclinicaservice, VeterinarioService $veterinarioservice) {
+    public function __construct(EvolucionService $evolucionservice, HistoriaClinicaService $historiaclinicaservice, VeterinarioService $veterinarioservice) {
         $this->evolucion_service = $evolucionservice;
         $this->historia_clinica_service = $historiaclinicaservice;
         $this->veterinario_service = $veterinarioservice;
@@ -30,6 +30,13 @@ class EvolucionController extends Controller
     public function create()
     {
         $historiasClinicas = $this->historia_clinica_service->listartodo();
+        
+        if ($historiasClinicas->isEmpty()) {
+                return redirect()
+                    ->route('evolucion.index')
+                    ->with('error', 'Primero debes registrar una historia clínica para crear una evolución.');
+            }
+
         $veterinarios = $this->veterinario_service->listartodo();
         return view('Evolucion.create', compact('historiasClinicas', 'veterinarios'));
     }
@@ -55,7 +62,7 @@ class EvolucionController extends Controller
 
     public function update(int $id, EvolucionStoreRequest $request)
     {
-        $this->evolucion_service->update($id, $request->all());
+        $this->evolucion_service->update($id, $request->validated());
         return redirect()->route('evolucion.index')->with('update', 'Evolucion actualizada correctamente');
     }
 

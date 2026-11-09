@@ -18,7 +18,8 @@ class EvolucionService{
 
     public function store(array $datos)
     {
-        $this->evolucion_repository->store($datos);
+        $datos['fecha'] = now();
+        return $this->evolucion_repository->store($datos);
     }
 
     public function edit(int $id)

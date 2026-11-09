@@ -12,7 +12,7 @@ class DiagnosticoTratamientoRepository{
 
     public function store(array $datos)
     {
-        DiagnosticoTratamiento::create($datos);
+        return DiagnosticoTratamiento::create($datos);
     }
 
     public function edit(int $id)

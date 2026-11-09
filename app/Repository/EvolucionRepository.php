@@ -7,12 +7,12 @@ use App\Models\Evolucion;
 class EvolucionRepository{
 
     public function listartodo(){
-        return Evolucion::with('HistoriaClinica', 'Veterinario')->get();
+        return Evolucion::with('HistoriaClinica.Mascota', 'Veterinario')->get();
     }
 
     public function store(array $datos)
     {
-        Evolucion::create($datos);
+        return Evolucion::create($datos);
     }
 
     public function edit(int $id)

@@ -18,7 +18,7 @@ class DiagnosticoTratamientoService{
 
     public function store(array $datos)
     {
-        $this->diagnostico_tratamiento_repository->store($datos);
+        return $this->diagnostico_tratamiento_repository->store($datos);
     }
 
     public function edit(int $id)
