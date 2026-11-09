@@ -20,7 +20,7 @@ class HorarioController extends Controller
     
     public function index()
     {
-        $horarios = $this->horario_service->listartodo();
+        $horarios = $this->horario_service->listarPaginado(10);
         return view('Horario.index', compact('horarios'));
     }
 

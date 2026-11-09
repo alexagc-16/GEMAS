@@ -8,7 +8,7 @@ class Horario extends Model
 {
     protected $table = 'horario'; 
 
-    protected $fillable = ['diaSemana', 'horaInicio', 'horaFin', 'idVeterinario'];
+    protected $fillable = ['diaSemana', 'horaInicio', 'horaFin', 'horaAlmuerzoInicio', 'horaAlmuerzoFin', 'idVeterinario'];
 
     public function Veterinario(){
         return $this->belongsTo(Veterinario::class, 'idVeterinario');

@@ -6,6 +6,13 @@ use App\Models\Horario;
 
 class HorarioRepository{
 
+    public function listarPaginado(int $porPagina = 10)
+    {
+        return Horario::with('Veterinario')
+            ->latest()
+            ->paginate($porPagina);
+    }
+
     public function listartodo(){
         return Horario::with('Veterinario')->get();
     }

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('diaSemana');
             $table->time('horaInicio');
             $table->time('horaFin');
+            $table->time('horaAlmuerzoInicio')->nullable();
+            $table->time('horaAlmuerzoFin')->nullable();
             $table->unsignedBigInteger('idVeterinario');
             $table->foreign('idVeterinario')->references('id')->on('veterinario');
             $table->timestamps();

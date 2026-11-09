@@ -26,6 +26,8 @@ class HorarioStoreRequest extends FormRequest
             'diaSemana' => 'required|string|max:25',
             'horaInicio' => 'required|date_format:H:i',
             'horaFin' => 'required|date_format:H:i|after:horaInicio',
+            'horaAlmuerzoInicio' => 'nullable|date_format:H:i',
+            'horaAlmuerzoFin' => 'nullable|date_format:H:i|after:horaAlmuerzoInicio',
             'idVeterinario' => 'required|exists:veterinario,id',
         ];
 
@@ -42,6 +44,9 @@ class HorarioStoreRequest extends FormRequest
 
         'horaFin.required' => 'La hora de finalización es obligatoria.',
         'horaFin.date_format' => 'La hora de finalización debe tener un formato válido.',
+
+        'horaAlmuerzoInicio.date_format' => 'La hora de inicio debe tener un formato válido.',
+        'horaAlmuerzoFin.date_format' => 'La hora de inicio debe tener un formato válido.',
 
         'idVeterinario.required' => 'El veterinario es obligatorio.',
         'idVeterinario.exists' => 'El veterinario seleccionado no existe.',
