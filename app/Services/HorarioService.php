@@ -17,7 +17,8 @@ class HorarioService{
         return $this->horario_repository->listarPaginado($porPagina);
     }
 
-    public function listartodo(){
+    public function listartodo()
+    {
         return $this->horario_repository->listartodo();
     }
     
