@@ -16,8 +16,14 @@ class UsuarioService{
         $this->usuario_seguridad_repository = $usuarioseguridadrepository;
     }
 
-    public function listarPaginado(int $porPagina = 10){
-        return $this->usuario_repository->listarPaginado($porPagina);
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
+    {
+        return $this->usuario_repository->listarPaginado($porPagina, $filtros);
+    }
+
+    public function listarActivosPorRol(string $rol)
+    {
+        return $this->usuario_repository->listarActivosPorRol($rol);
     }
 
     public function listartodo(){
@@ -52,11 +58,6 @@ class UsuarioService{
     public function update(int $id, array $datos)
     {
         $this->usuario_repository->update($id, $datos);
-    }
-
-    public function destroy(int $id)
-    {
-        $this->usuario_repository->destroy($id);
     }
 
 }

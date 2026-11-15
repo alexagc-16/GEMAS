@@ -17,10 +17,16 @@ class UsuarioController extends Controller
         $this->usuario_service = $usuarioservice;
     }
    
-    public function index()
+    public function index(Request $request)
     {
-        $usuarios = $this->usuario_service->listarPaginado(10);
-        return view('Usuario.index', compact('usuarios'));
+        $filtros = $request->only([
+            'buscar',
+            'rol',
+        ]);
+
+        $usuarios = $this->usuario_service->listarPaginado(10, $filtros);
+
+        return view('Usuario.index', compact('usuarios', 'filtros'));
     }
 
     public function create()
@@ -51,10 +57,4 @@ class UsuarioController extends Controller
         return redirect()->route('usuario.index')->with('update', 'Usuario actualizado correctamente');
     }
 
-    public function destroy(int $id)
-    {
-        $this->usuario_service->destroy($id);
-
-        return redirect()->route('usuario.index')->with('destroy', 'Usuario eliminado correctamente');
-    }
 }
