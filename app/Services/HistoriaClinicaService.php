@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\HistoriaClinica;
 use App\Repository\HistoriaClinicaRepository;
 use Illuminate\Validation\ValidationException;
 
@@ -14,14 +15,19 @@ class HistoriaClinicaService{
         $this->historia_clinica_repository = $historiaclinicarepository;
     }
 
-    public function listarPaginado(int $porPagina = 10)
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
     {
-        return $this->historia_clinica_repository->listarPaginado($porPagina);
+        return $this->historia_clinica_repository
+            ->listarPaginado($porPagina, $filtros);
     }
 
-    public function listarPaginadoPorUsuario(int $idUsuario, int $porPagina = 10)
-    {
-        return $this->historia_clinica_repository->listarPaginadoPorUsuario($idUsuario, $porPagina);
+    public function listarPaginadoPorUsuario(
+        int $idUsuario,
+        int $porPagina = 10,
+        array $filtros = []
+    ) {
+        return $this->historia_clinica_repository
+            ->listarPaginadoPorUsuario($idUsuario, $porPagina, $filtros);
     }
 
     public function listartodo(){
@@ -71,8 +77,12 @@ class HistoriaClinicaService{
         return $this->historia_clinica_repository->update($id, $datos);
     }
 
-    public function destroy(int $id)
+    public function buscarParaPdf(int $id)
     {
-        $this->historia_clinica_repository->destroy($id);
+        return HistoriaClinica::with([
+            'Mascota',
+            'Evolucion.Veterinario',
+            'Evolucion.DiagnosticoTratamiento'
+        ])->findOrFail($id);
     }
 }

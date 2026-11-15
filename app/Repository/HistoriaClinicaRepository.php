@@ -5,29 +5,64 @@ use App\Models\HistoriaClinica;
 
 class HistoriaClinicaRepository{
 
-    public function listarPaginado(int $porPagina = 10)
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
     {
-        return HistoriaClinica::with([
+        $consulta = HistoriaClinica::with([
             'Mascota',
             'Evolucion.Veterinario',
             'Evolucion.DiagnosticoTratamiento'
-        ])
+        ]);
+
+        $this->aplicarFiltros($consulta, $filtros);
+
+        return $consulta
             ->latest()
             ->paginate($porPagina);
     }
 
-    public function listarPaginadoPorUsuario(int $idUsuario, int $porPagina = 10)
+    public function listarPaginadoPorUsuario(int $idUsuario, int $porPagina = 10,array $filtros = []) 
     {
-        return HistoriaClinica::with([
+        $consulta = HistoriaClinica::with([
             'Mascota',
             'Evolucion.Veterinario',
             'Evolucion.DiagnosticoTratamiento'
         ])
             ->whereHas('Mascota', function ($consulta) use ($idUsuario) {
                 $consulta->where('idUsuario', $idUsuario);
-            })
+            });
+
+        $this->aplicarFiltros($consulta, $filtros);
+
+        return $consulta
             ->latest()
             ->paginate($porPagina);
+    }
+
+    /**
+     * Aplicar los filtros de búsqueda de historias clínicas.
+     */
+    private function aplicarFiltros($consulta, array $filtros): void
+    {
+        // Buscar por nombre de mascota.
+        if (!empty($filtros['buscar'])) {
+            $buscar = trim($filtros['buscar']);
+
+            $consulta->whereHas('Mascota', function ($subconsulta) use ($buscar) {
+                $subconsulta->where('nombre', 'LIKE', "%{$buscar}%");
+            });
+        }
+
+        // Filtrar por fecha de apertura.
+        if (!empty($filtros['fecha'])) {
+            $consulta->whereDate('fechaApertura', $filtros['fecha']);
+        }
+
+        // Filtrar por estado de la historia clínica.
+        if (($filtros['estado'] ?? '') === 'completa') {
+            $consulta->whereNotNull('completadaEn');
+        } elseif (($filtros['estado'] ?? '') === 'pendiente') {
+            $consulta->whereNull('completadaEn');
+        }
     }
 
     public function listartodo(){
@@ -66,8 +101,13 @@ class HistoriaClinicaRepository{
         $historiaClinica->update($datos);   
     }
 
-    public function destroy(int $id)
+    public function buscarParaPdf(int $id)
     {
-        HistoriaClinica::destroy($id);
+        return HistoriaClinica::with([
+            'Mascota',
+            'Evolucion.Veterinario',
+            'Evolucion.DiagnosticoTratamiento'
+        ])->findOrFail($id);
     }
+
 }
