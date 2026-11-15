@@ -1,158 +1,457 @@
 @extends('layouts.app')
 
-
 @section('title')
-    Crud Horario
+    Horarios - Gemas
 @endsection
-
 
 @section('content')
 
+    <div class="w-full max-w-7xl mx-auto space-y-6">
 
-    <div class="container mx-auto mt-10">
+        {{-- Encabezado --}}
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">
+                    Horarios
+                </h1>
 
-        <div class="bg-white shadow-lg rounded-lg p-6">
-
-            <div class="flex justify-between items-center mb-6">
-
-                <h2 class="text-2xl font-bold text-gray-700">
-                    Listado de Horarios
-                </h2>
-
-                <a href="{{ route('horario.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 transition">
-                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                    Nuevo Horario
-
-                </a>
-
+                <p class="mt-1 text-sm text-slate-500">
+                    Consulta los horarios y las jornadas de atención veterinaria.
+                </p>
             </div>
 
-            @if(session('success'))
+            @if(auth()->user()->tieneRolActivo('administrador') || auth()->user()->tieneRolActivo('veterinario'))
 
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                <a href="{{ route('horario.create') }}"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl
+                        bg-[#40899A] px-5 py-3 text-sm font-semibold text-white
+                        shadow-sm transition hover:bg-[#347787]">
 
-                    {{ session('success') }}
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
 
-                </div>
-
+                    Registrar horario
+                </a>
+            
             @endif
 
-            @if(session('update'))
+        </div>
 
-                <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4">
+        {{-- Mensajes del sistema --}}
+        @if(session('success'))
+            <div class="rounded-lg border border-green-200
+                        bg-green-50 px-4 py-3 text-sm text-green-700">
+                {{ session('success') }}
+            </div>
+        @endif
 
-                    {{ session('update') }}
+        @if(session('update'))
+            <div class="rounded-lg border border-blue-200
+                        bg-blue-50 px-4 py-3 text-sm text-blue-700">
+                {{ session('update') }}
+            </div>
+        @endif
 
-                </div>
+        @if(session('destroy'))
+            <div class="rounded-lg border border-red-200
+                        bg-red-50 px-4 py-3 text-sm text-red-700">
+                {{ session('destroy') }}
+            </div>
+        @endif
 
-            @endif
+        {{-- Filtros --}}
+        <x-filtros-tabla
+            buscador-id="buscarHorario"
+            placeholder="Buscar por día o nombre del veterinario..."
+            contador-id="contadorHorarios"
+            limpiar-id="limpiarFiltrosHorarios"
+            :contador-total="$horarios->total()"
+            :filtros="[
+                [
+                    'id' => 'filtroDia',
+                    'name' => 'diaSemana',
+                    'label' => 'Día de la semana',
+                    'todos' => 'Todos los días',
+                    'opciones' => [
+                        'Lunes' => 'Lunes',
+                        'Martes' => 'Martes',
+                        'Miércoles' => 'Miércoles',
+                        'Jueves' => 'Jueves',
+                        'Viernes' => 'Viernes',
+                        'Sábado' => 'Sábado',
+                        'Domingo' => 'Domingo',
+                    ],
+                ],
+                [
+                    'id' => 'filtroVeterinario',
+                    'name' => 'idVeterinario',
+                    'label' => 'Veterinario',
+                    'todos' => 'Todos los veterinarios',
+                    'opciones' => $veterinarios->pluck('nombre', 'id')->toArray(),
+                ],
+            ]"
+        />
 
-            @if(session('destroy'))
 
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{-- Tabla de horarios --}}
+        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
-                    {{ session('destroy') }}
+            {{-- Encabezado de la tabla --}}
+            <div class="border-b border-slate-200 px-6 py-5">
+                <h2 class="text-lg font-semibold text-slate-800">
+                    Horarios registrados
+                </h2>
 
-                </div>
+                <p class="mt-1 text-sm text-slate-500">
+                    Listado de las jornadas y los horarios de atención veterinaria.
+                </p>
+            </div>
 
-            @endif
+            <div class="w-full min-w-0 overflow-x-auto">
 
-            <div class="overflow-x-auto">
+                @php
+                    $puedeGestionarHorarios = auth()->user()->hasAnyRole(['administrador', 'veterinario']);
 
-                <table class="min-w-full border border-gray-300">
+                    $hayFiltrosAplicados = collect(request()->query())
+                            ->except('page')
+                            ->filter(fn ($valor) => filled($valor))
+                            ->isNotEmpty();
+                @endphp
 
-                    <thead class="bg-gray-200">
+                <table class="w-full text-sm text-left">
 
+                    <thead class="bg-slate-50 text-slate-500">
                         <tr>
 
-                            <th class="border px-4 py-2">
-                                ID
+                            @if(auth()->user()->hasRole('administrador'))
+                                <th class="whitespace-nowrap px-6 py-3 font-medium">
+                                    #
+                                </th>
+                            @endif
+
+                            <th class="px-6 py-3 font-medium">
+                                Día de la semana
                             </th>
 
-                            <th class="border px-4 py-2">
-                                Dia de la Semana
+                            <th class="px-6 py-3 font-medium">
+                                Inicio de jornada
                             </th>
 
-                            <th class="border px-4 py-2">
-                                Hora de Inicio
+                            <th class="px-6 py-3 font-medium">
+                                Fin de jornada
                             </th>
 
-                            <th class="border px-4 py-2">
-                                Hora de Fin
+                            <th class="px-6 py-3 font-medium">
+                                Horario de almuerzo
                             </th>
 
-                            <th class="border px-4 py-2">
+                            <th class="px-6 py-3 font-medium">
                                 Veterinario
                             </th>
 
-                            <th class="border px-4 py-2">
-                                Acciones
-                            </th>
+                            @if($puedeGestionarHorarios)
+                                <th class="px-6 py-3 text-center font-medium">
+                                    Acciones
+                                </th>
+                            @endif
 
                         </tr>
-
                     </thead>
 
-                    <tbody>
+                    <tbody class="divide-y divide-slate-100">
 
-                        @foreach ($horarios as $horario)
+                        @forelse($horarios as $horario)
 
-                            <tr class="text-center hover:bg-gray-50">
-                                <td class="border px-4 py-2">{{ $horario->id }}</td>
-                                <td class="border px-4 py-2">{{ $horario->diaSemana}}</td>
-                                <td class="border px-4 py-2">{{ $horario->horaInicio}}</td>
-                                <td class="border px-4 py-2">{{ $horario->horaFin}}</td>
-                                <td class="border px-4 py-2">{{ $horario->Veterinario->nombre}}</td>
-                                
-                                <td class="border px-4 py-2">
-                                    <div class="flex items-center justify-center gap-3">
-                                    <a href="{{ route('horario.edit',$horario->id) }}" class="text-blue-600 hover:text-blue-900 p-1" title="Editar">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                        </svg>
-                                    </a>
+                            <tr class="transition hover:bg-slate-50">
 
-                                    <!-- Botón Eliminar -->
-                                    <form action="{{ route('horario.destroy', $horario->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este horario?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900 p-1" title="Eliminar">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
-                                    </form>
+                                 @if(auth()->user()->hasRole('administrador'))
+                                    <td class="px-6 py-4 text-slate-500">
+                                        {{ $horario->id }}
+                                    </td>
+                                @endif
+
+                                {{-- Día --}}
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center rounded-full
+                                                bg-[#EAF4F5] px-3 py-1 text-xs
+                                                font-semibold text-[#40899A]">
+                                        {{ $horario->diaSemana }}
+                                    </span>
                                 </td>
 
-                            </tr> 
+                                {{-- Inicio de jornada --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-700">
+                                    {{ \Carbon\Carbon::parse($horario->horaInicio)->format('g:i A') }}
+                                </td>
+
+                                {{-- Fin de jornada --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-700">
+                                    {{ \Carbon\Carbon::parse($horario->horaFin)->format('g:i A') }}
+                                </td>
+
+                                {{-- Almuerzo --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+
+                                    @if($horario->horaAlmuerzoInicio && $horario->horaAlmuerzoFin)
+
+                                        <span class="text-slate-700">
+                                            {{ \Carbon\Carbon::parse($horario->horaAlmuerzoInicio)->format('g:i A') }}
+                                            -
+                                            {{ \Carbon\Carbon::parse($horario->horaAlmuerzoFin)->format('g:i A') }}
+                                        </span>
+
+                                    @else
+
+                                        <span class="text-xs font-medium text-slate-400">
+                                            No definido
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+                                {{-- Veterinario --}}
+                                <td class="px-6 py-4">
+
+                                    <div class="flex items-center gap-3">
+
+                                        <span class="font-medium text-slate-700">
+                                            {{ optional($horario->Veterinario)->nombre ?? 'No asignado' }}
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+                                {{-- Acciones --}}
+                                <td class="px-6 py-4">
+
+                                    @if($puedeGestionarHorarios)
+
+                                        <div class="flex items-center justify-center gap-2">
+
+                                            {{-- Editar --}}
+                                            <a href="{{ route('horario.edit', $horario->id) }}"
+                                                class="inline-flex items-center justify-center gap-1.5
+                                                    rounded-lg bg-[#EAF4F5] px-3 py-2
+                                                    text-xs font-semibold text-[#40899A]
+                                                    transition hover:bg-[#d5ebed]"
+                                                title="Editar horario">
+
+                                                <svg class="h-4 w-4" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="1.8"
+                                                        d="m16.862 4.487 2.651 2.651M4 20l4.5-.9L19.2 8.4a1.875 1.875 0 0 0-2.65-2.65L5.85 16.45 4 20Z"/>
+                                                </svg>
+
+                                                Editar
+                                            </a>
+
+                                            {{-- Eliminar --}}
+                                            <button type="button"
+                                                onclick="document.getElementById('modalEliminarHorario-{{ $horario->id }}').classList.remove('hidden')"
+                                                class="inline-flex items-center justify-center gap-1.5
+                                                    rounded-lg bg-red-50 px-3 py-2
+                                                    text-xs font-semibold text-red-600
+                                                    transition hover:bg-red-100"
+                                                title="Eliminar horario">
+
+                                                <svg class="h-4 w-4" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="1.8"
+                                                        d="M6 7h12m-10 0 .7 12h6.6L16 7M9 7V4h6v3m-5 4v5m4-5v5"/>
+                                                </svg>
+
+                                                Eliminar
+                                            </button>
+
+                                        </div>
+
+                                        {{-- Modal eliminar horario --}}
+                                        <div id="modalEliminarHorario-{{ $horario->id }}"
+                                            class="hidden fixed inset-0 z-50 flex items-center justify-center
+                                                bg-black/50 p-4">
+
+                                            <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+
+                                                {{-- Icono --}}
+                                                <div class="mx-auto flex h-14 w-14 items-center justify-center
+                                                    rounded-full bg-red-100 text-red-600">
+
+                                                    <svg class="h-10 w-10" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="1.3"
+                                                            d="M6 7h12m-10 0V5h8v2m-9 2 1 11h8l1-11M10 11v5m4-5v5" />
+                                                    </svg>
+                                                </div>
+
+                                                {{-- Texto --}}
+                                                <div class="mt-4 text-center">
+                                                    <h3 class="text-lg font-semibold text-slate-800">
+                                                        ¿Eliminar horario?
+                                                    </h3>
+
+                                                    <p class="mt-2 text-sm text-slate-500">
+                                                        ¿Estás seguro de que deseas eliminar este horario?
+                                                        Esta acción no se puede deshacer.
+                                                    </p>
+                                                </div>
+
+                                                {{-- Botones --}}
+                                                <div class="mt-6 flex justify-center gap-3">
+
+                                                    <button type="button"
+                                                        onclick="document.getElementById('modalEliminarHorario-{{ $horario->id }}').classList.add('hidden')"
+                                                        class="rounded-lg border border-slate-300 px-4 py-2
+                                                            text-sm font-medium text-slate-600
+                                                            transition hover:bg-slate-50">
+                                                        Cancelar
+                                                    </button>
+
+                                                    <form action="{{ route('horario.destroy', $horario->id) }}"
+                                                        method="POST">
+
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <button type="submit"
+                                                            class="rounded-lg bg-red-600 px-4 py-2
+                                                                text-sm font-semibold text-white
+                                                                transition hover:bg-red-700">
+                                                            Sí, eliminar
+                                                        </button>
+                                                    </form>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    @endif
+
+                                </td>
+
+                            </tr>
+
+                        @empty
                             
-                        @endforeach
+                            @if ($hayFiltrosAplicados)
 
-                        @if ($horarios->isEmpty())
+                                {{-- Sin resultados de búsqueda --}}
+                                <tr>
+                                    <td colspan="7" class="px-6 py-10 text-center">
 
-                        <tr>
+                                        <h3 class="text-lg font-semibold text-slate-700">
+                                            No se encontraron resultados
+                                        </h3>
 
-                            <td colspan="6" class="border px-4 py-6 text-center text-gray-500">
-                                No hay horarios registrados.
-                            </td>
+                                        <p class="mt-1 text-sm text-slate-500">
+                                            No hay horarios que coincidan con los filtros aplicados.
+                                        </p>
 
-                        </tr>
+                                    </td>
+                                </tr>
 
-                        @endif
+                            @else
 
+                                {{-- Sin horarios --}}
+                                <tr>
+                                    <td colspan="7" class="px-6 py-10 text-center">
 
-                    </tbody>   
+                                        <div class="mx-auto flex h-16 w-16
+                                                    items-center justify-center
+                                                    rounded-full bg-[#EAF4F5]
+                                                    text-[#40899A]">
+
+                                            @include('layouts.partials.icons', [
+                                                'icon' => 'horario'
+                                            ])
+
+                                        </div>
+
+                                        <h3 class="mt-4 text-lg font-semibold text-slate-800">
+                                            No hay horarios registrados
+                                        </h3>
+
+                                        <p class="mt-2 text-sm text-slate-500">
+                                            Cuando registres un horario, aparecerá aquí.
+                                        </p>
+
+                                        <a href="{{ route('horario.create') }}"
+                                            class="mt-5 inline-flex items-center gap-2
+                                                rounded-lg bg-[#40899A] px-4 py-2.5
+                                                text-sm font-semibold text-white
+                                                transition hover:bg-[#347787]">
+
+                                            <svg class="h-4 w-4" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+
+                                                <path stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2" d="M12 4v16m8-8H4"/>
+
+                                            </svg>
+
+                                            Registrar primer horario
+
+                                        </a>
+
+                                    </td>
+                                </tr>
+
+                            @endif
+
+                        @endforelse
+
+                    </tbody>
 
                 </table>
-            
+
             </div>
 
         </div>
 
+        {{-- Paginación --}}
+        @if($horarios->hasPages())
+
+            <div class="border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
+
+                <div class="flex flex-col gap-3 sm:flex-row
+                            sm:items-center sm:justify-between">
+
+                    <p class="text-sm text-slate-500">
+                        Mostrando
+                        <span class="font-semibold text-slate-700">
+                            {{ $horarios->firstItem() ?? 0 }}
+                        </span>
+                        a
+                        <span class="font-semibold text-slate-700">
+                            {{ $horarios->lastItem() ?? 0 }}
+                        </span>
+                        de
+                        <span class="font-semibold text-slate-700">
+                            {{ $horarios->total() }}
+                        </span>
+                        horarios
+                    </p>
+
+                    <div>
+                        {{ $horarios->onEachSide(1)->links('vendor.pagination.gemas') }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        @endif
+
     </div>
-
-
 
 @endsection

@@ -8,11 +8,45 @@ use Spatie\Permission\Models\Role;
 
 class HorarioRepository{
 
-    public function listarPaginado(int $porPagina = 10)
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
     {
         $consulta = $this->consultaSegunUsuario();
 
-        return $consulta->latest()->paginate($porPagina);
+        // Búsqueda general: día de la semana o nombre del veterinario.
+        if (!empty($filtros['buscar'])) {
+
+            $buscar = trim($filtros['buscar']);
+
+            $consulta->where(function ($query) use ($buscar) {
+
+                $query->where('diaSemana', 'LIKE', "%{$buscar}%")
+
+                    ->orWhereHas('Veterinario', function ($subquery) use ($buscar) {
+
+                        $subquery->where('nombre', 'LIKE', "%{$buscar}%");
+
+                    });
+
+            });
+        }
+
+        // Filtro por día de la semana.
+        if (!empty($filtros['diaSemana'])) {
+
+            $consulta->where('diaSemana', $filtros['diaSemana']);
+
+        }
+
+        // Filtro por veterinario.
+        if (!empty($filtros['idVeterinario'])) {
+
+            $consulta->where('idVeterinario', $filtros['idVeterinario']);
+
+        }
+
+        return $consulta->latest()
+            ->paginate($porPagina)
+            ->withQueryString();
     }
 
     public function listartodo()

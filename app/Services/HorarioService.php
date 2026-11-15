@@ -12,9 +12,9 @@ class HorarioService{
         $this->horario_repository = $horariorepository;
     }
 
-    public function listarPaginado(int $porPagina = 10)
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
     {
-        return $this->horario_repository->listarPaginado($porPagina);
+        return $this->horario_repository->listarPaginado($porPagina, $filtros);
     }
 
     public function listartodo()

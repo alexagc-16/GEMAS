@@ -18,11 +18,19 @@ class HorarioController extends Controller
         $this->veterinario_service = $veterinarioservice;
     }
     
-    public function index()
+    public function index(Request $request)
     {
-        $horarios = $this->horario_service->listarPaginado(10);
+        $filtros = $request->only([
+            'buscar',
+            'diaSemana',
+            'idVeterinario',
+        ]);
 
-        return view('Horario.index', compact('horarios'));
+        $horarios = $this->horario_service->listarPaginado(10, $filtros);
+
+        $veterinarios = $this->veterinario_service->listartodo();
+
+        return view('Horario.index', compact('horarios', 'veterinarios'));
     }
 
     public function create()
