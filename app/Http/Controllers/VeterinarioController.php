@@ -16,10 +16,22 @@ class VeterinarioController extends Controller
         $this->veterinario_service = $veterinarioservice;
     }
     
-    public function index()
+    public function index(Request $request)
     {
-        $veterinarios = $this->veterinario_service->listarPaginado(10);
-        return view('Veterinario.index', compact('veterinarios'));
+        $filtros = $request->only(['buscar', 'especialidad']);
+
+        $veterinarios = $this->veterinario_service->listarPaginado(
+            10,
+            $filtros
+        );
+
+        $especialidades = $this->veterinario_service->listarEspecialidades();
+
+        return view('Veterinario.index', compact(
+            'veterinarios',
+            'especialidades',
+            'filtros'
+        ));
     }
 
     public function create()
@@ -59,9 +71,4 @@ class VeterinarioController extends Controller
         return redirect()->route('veterinario.index')->with('update', 'Veterinario actualizado correctamente');
     }
 
-    public function destroy(int $id)
-    {
-        $this->veterinario_service->destroy($id);
-        return redirect()->route('veterinario.index')->with('destroy', 'Veterinario eliminado correctamente');
-    }
 }

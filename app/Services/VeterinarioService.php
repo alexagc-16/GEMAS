@@ -21,8 +21,17 @@ class VeterinarioService{
         $this->usuario_repository = $usuariorepository;
     }
 
-    public function listarPaginado(int $porPagina = 10){
-        return $this->veterinario_repository->listarPaginado($porPagina);
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
+    {
+        return $this->veterinario_repository->listarPaginado(
+            $porPagina,
+            $filtros
+        );
+    }
+
+    public function listarEspecialidades()
+    {
+        return $this->veterinario_repository->listarEspecialidades();
     }
 
     public function listartodo(){
@@ -103,10 +112,5 @@ class VeterinarioService{
                 'email' => $datos['email'],
             ]);
         });
-    }
-
-    public function destroy(int $id)
-    {
-        $this->veterinario_repository->destroy($id);
     }    
 }

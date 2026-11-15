@@ -6,8 +6,42 @@ use App\Models\Veterinario;
 
 class VeterinarioRepository{
 
-    public function listarPaginado(int $porPagina = 10){
-        return Veterinario::latest()->paginate($porPagina);
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
+    {
+        $consulta = Veterinario::query();
+
+        // Búsqueda general
+        if (!empty($filtros['buscar'])) {
+            $buscar = trim($filtros['buscar']);
+
+            $consulta->where(function ($query) use ($buscar) {
+                $query->where('nombre', 'like', "%{$buscar}%")
+                    ->orWhere('apellido', 'like', "%{$buscar}%")
+                    ->orWhere('documentoIdentidad', 'like', "%{$buscar}%")
+                    ->orWhere('telefono', 'like', "%{$buscar}%")
+                    ->orWhere('email', 'like', "%{$buscar}%")
+                    ->orWhere('especialidad', 'like', "%{$buscar}%");
+            });
+        }
+
+        // Filtro por especialidad
+        if (!empty($filtros['especialidad'])) {
+            $consulta->where('especialidad', $filtros['especialidad']);
+        }
+
+        return $consulta->latest()
+            ->paginate($porPagina)
+            ->withQueryString();
+    }
+
+    public function listarEspecialidades()
+    {
+        return Veterinario::query()
+            ->whereNotNull('especialidad')
+            ->where('especialidad', '!=', '')
+            ->distinct()
+            ->orderBy('especialidad')
+            ->pluck('especialidad', 'especialidad');
     }
     
     public function listartodo(){
@@ -29,11 +63,6 @@ class VeterinarioRepository{
         $veterinario = Veterinario::findOrfail($id);
         $veterinario->update($datos);
 
-    }
-
-    public function destroy(int $id)
-    {
-        Veterinario::destroy($id);
     }
 
 }
