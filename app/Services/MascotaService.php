@@ -17,13 +17,28 @@ class MascotaService{
         $this->historia_clinica_service = $historiaclinicaservice;
     }
 
-    public function listarPaginado(int $porPagina = 10){
-        return $this->mascota_repository->listarPaginado($porPagina);
+    public function listarPaginado(
+    int $porPagina = 10,
+    array $filtros = []
+    ) {
+        return $this->mascota_repository->listarPaginado($porPagina, $filtros);
     }
 
-    public function listarPaginadoPorUsuario(int $idUsuario, int $porPagina = 10)
+    public function listarPaginadoPorUsuario(
+        int $idUsuario,
+        int $porPagina = 10,
+        array $filtros = []
+    ) {
+        return $this->mascota_repository->listarPaginadoPorUsuario(
+            $idUsuario,
+            $porPagina,
+            $filtros
+        );
+    }
+
+    public function listarEspecies()
     {
-        return $this->mascota_repository->listarPaginadoPorUsuario($idUsuario, $porPagina);
+        return $this->mascota_repository->listarEspecies();
     }
 
     public function listarTodo(){

@@ -5,15 +5,69 @@ use App\Models\Mascota;
 
 class MascotaRepository{
 
-    public function listarPaginado(int $porPagina = 10){
-        return Mascota::latest()->paginate($porPagina);
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
+    {
+        return $this->aplicarFiltros(
+            Mascota::with('Usuario'),
+            $filtros
+        )
+            ->latest()
+            ->paginate($porPagina)
+            ->withQueryString();
     }
 
-    public function listarPaginadoPorUsuario(int $idUsuario, int $porPagina = 10)
-    {
-        return Mascota::where('idUsuario', $idUsuario)
+    public function listarPaginadoPorUsuario(
+        int $idUsuario,
+        int $porPagina = 10,
+        array $filtros = []
+    ) {
+        return $this->aplicarFiltros(
+            Mascota::with('Usuario')->where('idUsuario', $idUsuario),
+            $filtros
+        )
             ->latest()
-            ->paginate($porPagina);
+            ->paginate($porPagina)
+            ->withQueryString();
+    }
+
+    /**
+     * Aplicar los filtros de búsqueda a la consulta de mascotas.
+     */
+    private function aplicarFiltros($query, array $filtros)
+    {
+        return $query
+            ->when(!empty($filtros['buscar']), function ($query) use ($filtros) {
+                $buscar = trim($filtros['buscar']);
+
+                $query->where(function ($subQuery) use ($buscar) {
+                    $subQuery
+                        ->where('nombre', 'like', "%{$buscar}%")
+                        ->orWhere('raza', 'like', "%{$buscar}%")
+                        ->orWhere('especie', 'like', "%{$buscar}%")
+                        ->orWhereHas('Usuario', function ($usuarioQuery) use ($buscar) {
+                            $usuarioQuery->where('nombre', 'like', "%{$buscar}%");
+                        });
+                });
+            })
+            ->when(!empty($filtros['especie']), function ($query) use ($filtros) {
+                $query->where('especie', $filtros['especie']);
+            })
+            ->when(!empty($filtros['sexo']), function ($query) use ($filtros) {
+                $query->where('sexo', $filtros['sexo']);
+            });
+    }
+
+    /**
+     * Obtener las especies registradas para el filtro.
+     */
+    public function listarEspecies()
+    {
+        return Mascota::query()
+            ->whereNotNull('especie')
+            ->where('especie', '!=', '')
+            ->distinct()
+            ->orderBy('especie')
+            ->pluck('especie');
     }
 
     public function listarTodo(){

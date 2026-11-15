@@ -26,18 +26,37 @@ class MascotaController extends Controller
         /** @var Usuario $usuario */
         $usuario = Auth::user();
 
+        $filtros = [
+            'buscar' => request('buscar'),
+            'especie' => request('especie'),
+            'sexo' => request('sexo'),
+        ];
+
         if ($usuario->tieneRolActivo('usuario')) {
-            $mascotas = $this->mascota_service->listarPaginadoPorUsuario($usuario->id, 10);
+            $mascotas = $this->mascota_service->listarPaginadoPorUsuario(
+                $usuario->id,
+                10,
+                $filtros
+            );
         } else {
-            $mascotas = $this->mascota_service->listarPaginado(10);
+            $mascotas = $this->mascota_service->listarPaginado(
+                10,
+                $filtros
+            );
         }
 
-        return view('Mascota.index', compact('mascotas'));
+        $especies = $this->mascota_service->listarEspecies();
+
+        return view('Mascota.index', compact(
+            'mascotas',
+            'filtros',
+            'especies'
+        ));
     }
     
     public function create()
     {
-        $usuarios = $this->usuario_service->listartodo();
+        $usuarios = $this->usuario_service->listarActivosPorRol('usuario');
         return view('Mascota.create', compact('usuarios'));
     }
 
@@ -67,7 +86,7 @@ class MascotaController extends Controller
             $mascota = $this->mascota_service->edit($id);
         }
 
-        $usuarios = $this->usuario_service->listartodo();
+        $usuarios = $this->usuario_service->listarActivosPorRol('usuario');
 
         return view('Mascota.update', compact('mascota', 'usuarios'));
     }
