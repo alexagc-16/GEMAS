@@ -26,6 +26,9 @@ return [
         'iniciarConsulta' => 'editar',
         'finalizarConsulta' => 'editar',
         'marcarNoAsistio' => 'editar',
+
+        // Acciones especiales de historias clínicas
+        'descargarPdf' => 'ver',
     ],
 
     'permisos_por_rol' => [
@@ -47,8 +50,8 @@ return [
 
         'veterinario' => [
             'perfil' => ['ver', 'editar'],
-            'mascota' => ['ver', 'crear'],
-            'historiaclinica' => ['ver', 'editar'],
+            'mascota' => ['ver', 'crear', 'editar'],
+            'historiaclinica' => ['ver', 'crear', 'editar'],
             'servicio' => ['ver'],
             'horario' => ['ver', 'crear', 'editar', 'eliminar'],
             'cita' => ['ver', 'editar'],
@@ -60,6 +63,7 @@ return [
     'permisos_especiales_por_rol' => [
         'usuario' => [
             'crear cancelacioncita',
+            'desactivar perfil'
         ],
 
         'veterinario' => [
@@ -69,7 +73,7 @@ return [
 
     'auditar_prefijos' => ['App\\'],
 
-    'redirect_despues_login' => '/',
+    'redirect_despues_login' => '/dashboard',
 
     'admin' => [
         'name' => env('SEGURIDAD_ADMIN_NAME', 'Administrador'),

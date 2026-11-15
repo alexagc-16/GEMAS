@@ -11,12 +11,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AutorizarModulo
 {
+    
     public function handle(Request $request, Closure $next, string $modulo): Response
     {
         $usuario = $request->user();
 
         if ($usuario === null) {
             throw new AuthenticationException();
+        }
+
+        // La desactivación del perfil tiene autorización propia en CuentaService.
+        if (
+            $modulo === 'perfil' &&
+            $request->route()->getActionMethod() === 'desactivar' &&
+            $request->route()->getControllerClass() === \App\Http\Controllers\MiPerfilController::class
+        ) {
+            return $next($request);
         }
 
         $permiso = $this->accion($request->route()) . ' ' . $modulo;
