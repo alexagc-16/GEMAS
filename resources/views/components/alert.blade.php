@@ -6,7 +6,7 @@
 
 @php
     $map = [
-        'success' => ['bg-emerald-50 text-emerald-700 border-emerald-200', 'text-emerald-500'],
+        'correct' => ['bg-emerald-50 text-emerald-700 border-emerald-200', 'text-emerald-500'],
         'error'   => ['bg-red-50 text-red-700 border-red-200', 'text-red-500'],
         'warning' => ['bg-amber-50 text-amber-700 border-amber-200', 'text-amber-500'],
         'info'    => ['bg-primary-50 text-primary-700 border-primary-200', 'text-primary-500'],

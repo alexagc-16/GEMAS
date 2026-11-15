@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Veterinario extends Model
+{
+    protected $table= 'veterinario';
+
+    protected $fillable = ['nombre', 'apellido', 'documentoIdentidad', 'telefono', 'email', 'especialidad'];
+
+    public function Horario(){
+        return $this->hasMany(Horario::class);
+    }
+
+    public function Cita(){
+        return $this->hasMany(Cita::class);
+    }
+
+    public function Evolucion(){
+        return $this->hasMany(Evolucion::class);
+    }
+}
