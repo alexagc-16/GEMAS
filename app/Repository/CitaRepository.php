@@ -8,18 +8,60 @@ use Spatie\Permission\Models\Role;
 
 class CitaRepository {
 
-    public function listarPaginado(int $porPagina = 10)
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
     {
-        return $this->consultaSegunUsuario()
-            ->with(['Mascota', 'Veterinario', 'Servicio', 'CancelacionCita'])
+        $consulta = $this->consultaSegunUsuario()
+            ->with(['Mascota', 'Veterinario', 'Servicio', 'CancelacionCita']);
+
+        // Búsqueda por mascota, veterinario o servicio.
+        if (!empty($filtros['buscar'])) {
+            $buscar = trim($filtros['buscar']);
+
+            $consulta->where(function ($query) use ($buscar) {
+                $query->whereHas('Mascota', function ($subQuery) use ($buscar) {
+                    $subQuery->where('nombre', 'like', "%{$buscar}%");
+                })
+                ->orWhereHas('Veterinario', function ($subQuery) use ($buscar) {
+                    $subQuery->where('nombre', 'like', "%{$buscar}%")
+                        ->orWhere('apellido', 'like', "%{$buscar}%")
+                        ->orWhereRaw(
+                            "CONCAT(nombre, ' ', apellido) LIKE ?",
+                            ["%{$buscar}%"]
+                        );
+                })
+                ->orWhereHas('Servicio', function ($subQuery) use ($buscar) {
+                    $subQuery->where('nombre', 'like', "%{$buscar}%");
+                });
+            });
+        }
+
+        // Filtrar por estado.
+        if (!empty($filtros['estado'])) {
+            $consulta->where('estado', $filtros['estado']);
+        }
+
+        // Filtrar por fecha.
+        if (!empty($filtros['fecha'])) {
+            $consulta->whereDate('fecha', $filtros['fecha']);
+        }
+
+        return $consulta
             ->latest()
-            ->paginate($porPagina);
+            ->paginate($porPagina)
+            ->withQueryString();
     }
 
     public function listartodo()
     {
         return $this->consultaSegunUsuario()
             ->with(['Mascota', 'Veterinario', 'Servicio', 'CancelacionCita'])
+            ->get();
+    }
+
+    public function listarPorVeterinario(int $idVeterinario)
+    {
+        return Cita::with('Mascota', 'Veterinario', 'Servicio')
+            ->where('idVeterinario', $idVeterinario)
             ->get();
     }
 

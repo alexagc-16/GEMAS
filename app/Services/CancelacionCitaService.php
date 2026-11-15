@@ -73,19 +73,23 @@ class CancelacionCitaService{
                     throw new AuthorizationException('No puedes cancelar una cita que no pertenece a tus mascotas.');
                 }
 
-                // El usuario debe cancelar con al menos tres horas de anticipación.
-                $fechaHoraCita = Carbon::parse($cita->fecha . ' ' . $cita->hora);
-
-                if (now()->greaterThanOrEqualTo($fechaHoraCita->copy()->subHours(3))) {
-                    throw ValidationException::withMessages([
-                        'cancelacion' => 'Debes cancelar con al menos 3 horas de anticipación. Comunícate con la clínica si necesitas cancelar fuera de ese plazo.',
-                    ]);
-                }
-
                 $tipoCancelador = 'Usuario';
 
             } else {
                 throw new AuthorizationException('No tienes permiso para cancelar citas.');
+            }
+
+            // El administrador puede cancelar en cualquier momento.
+            // Los demás roles deben respetar las tres horas de anticipación.
+            if (!$usuario->hasRole('administrador')) {
+
+                $fechaHoraCita = Carbon::parse($cita->fecha . ' ' . $cita->hora);
+
+                if (now()->greaterThan($fechaHoraCita->copy()->subHours(3))) {
+                    throw ValidationException::withMessages([
+                        'cancelacion' => 'No es posible cancelar esta cita. Las cancelaciones deben realizarse con al menos 3 horas de anticipación. Comunícate con la clínica si necesitas cancelar fuera de ese plazo.',
+                    ]);
+                }
             }
 
             // Elimina espacios al inicio y al final del motivo.

@@ -30,11 +30,43 @@ class CitaService {
         $this->historia_clinica_service = $historiaclinicaservice;
     }
 
-    public function listarPaginado(int $porPagina = 10){
-        return $this->cita_repository->listarPaginado($porPagina);
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
+    {
+        return $this->cita_repository->listarPaginado($porPagina, $filtros);
     }
 
-    public function listartodo(){
+    public function listartodo()
+    {
+        $usuario = Auth::user();
+
+        // Comprobar si el usuario autenticado tiene el rol de veterinario.
+        $esVeterinario = Role::where('name', 'veterinario')
+            ->where('activo', true)
+            ->whereHas('users', function ($query) use ($usuario) {
+                $query->where('model_id', $usuario->id);
+            })
+            ->exists();
+
+        // Si es veterinario, consultar únicamente sus citas.
+        if ($esVeterinario) {
+
+            // Buscar el registro de veterinario asociado a su cuenta.
+            $veterinario = Veterinario::where(
+                'documentoIdentidad',
+                $usuario->documentoIdentidad
+            )->first();
+
+            // Si no tiene un registro de veterinario, no mostrar citas.
+            if (!$veterinario) {
+                return collect();
+            }
+
+            return $this->cita_repository->listarPorVeterinario(
+                $veterinario->id
+            );
+        }
+
+        // Administrador y demás usuarios conservan la consulta original.
         return $this->cita_repository->listartodo();
     }
 
@@ -221,7 +253,7 @@ class CitaService {
         }
 
         // Verificar que la cita esté dentro de su ventana horaria.
-        $this->validarVentanaNoAsistencia($id);
+        $this->validarVentanaNoAsistencia($cita);
 
         // Actualizar el estado de la cita.
         $this->cita_repository->update($id, [
@@ -397,31 +429,42 @@ class CitaService {
         }
     }
 
-    public function validarVentanaNoAsistencia(int $id)
+    private function validarVentanaNoAsistencia(Cita  $cita)
     {
-        // Obtener la cita y la duración del servicio.
-        $cita = $this->cita_repository->edit($id);
-        $servicio = Servicio::findOrFail($cita->idServicio);
-        $duracion = (int) $servicio->duracionMinutos;
+        // Obtener la duración del servicio.
+        $duracion = (int) ($cita->Servicio?->duracionMinutos ?? 0);
 
-        if ($duracion <= 15) {
+        if ($duracion <= 0) {
             throw ValidationException::withMessages([
-                'hora' => 'La duración del servicio debe ser mayor a 15 minutos para registrar una inasistencia.',
+                'estado' => 'No se puede registrar la inasistencia porque el servicio no tiene una duración válida.',
             ]);
         }
 
-        // Calcular el inicio y el final de la atención.
-        $inicio = Carbon::parse($cita->fecha . ' ' . $cita->hora);
-        $limiteMinimo = $inicio->copy()->addMinutes(15);
+        // Fecha y hora de inicio de la cita.
+        $inicio = Carbon::parse(
+            $cita->fecha . ' ' . $cita->hora
+        );
+
+        // Momento desde el que se permite registrar la inasistencia.
+        $inicioPermitido = $inicio->copy()->addMinutes(15);
+
+        // Finalización del servicio.
         $fin = $inicio->copy()->addMinutes($duracion);
 
+        // Hora actual.
         $ahora = now();
 
-        // La inasistencia solo puede registrarse después de 15 minutos
-        // y antes de que termine la duración del servicio.
-        if ($ahora->lt($limiteMinimo) || $ahora->gte($fin)) {
+        // Antes de los primeros 15 minutos.
+        if ($ahora->lt($inicioPermitido)) {
             throw ValidationException::withMessages([
-                'hora' => 'Solo puedes marcar No asistió después de 15 minutos de la hora programada y antes de finalizar la duración del servicio.',
+                'estado' => 'Aún no se puede registrar la inasistencia. Deben transcurrir 15 minutos desde el inicio de la cita.',
+            ]);
+        }
+
+        // Después de finalizar el servicio.
+        if ($ahora->gt($fin)) {
+            throw ValidationException::withMessages([
+                'estado' => 'No se puede registrar la inasistencia porque el tiempo del servicio ya finalizó.',
             ]);
         }
     }

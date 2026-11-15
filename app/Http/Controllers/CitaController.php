@@ -32,10 +32,25 @@ class CitaController extends Controller
         $this->historia_clinica_service = $historiaclinicaservice;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $citas = $this->cita_service->listarPaginado(10);
-        return view('Cita.index', compact('citas'));
+        $filtros = $request->only([
+            'buscar',
+            'estado',
+            'fecha',
+        ]);
+
+        // Citas filtradas antes de aplicar la paginación.
+        $citas = $this->cita_service->listarPaginado(10, $filtros);
+
+        // Citas completas para mostrar en el calendario.
+        $citasCalendario = $this->cita_service->listartodo();
+
+        return view('Cita.index', compact(
+            'citas',
+            'citasCalendario',
+            'filtros'
+        ));
     }
 
     public function create()
@@ -61,7 +76,7 @@ class CitaController extends Controller
         return redirect()->route('cita.index')->with('success', 'Cita creada correctamente');
     }
 
-    public function show(int $id)   
+    public function show(int $id)
     {
         // Buscar la cita seleccionada.
         $cita = $this->cita_service->edit($id);
@@ -69,15 +84,22 @@ class CitaController extends Controller
         // Solo el veterinario asignado puede acceder a la consulta.
         $this->cita_service->validarVeterinarioAsignado($cita);
 
-        // Solo se puede iniciar o continuar una cita
-        // confirmada o que ya esté en atención.
+        // Solo se puede iniciar o continuar una cita confirmada o en atención.
         if (!in_array($cita->estado, ['Confirmada', 'En atención'], true)) {
             abort(403, 'Esta cita no se puede atender.');
         }
 
-        // Validar la ventana horaria únicamente al iniciar.
+        // Validar la ventana horaria antes de iniciar la atención.
         if ($cita->estado === 'Confirmada') {
-            $this->cita_service->validarVentanaAtencion($id);
+            try {
+                $this->cita_service->validarVentanaAtencion($id);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $mensaje = collect($e->errors())->flatten()->first();
+
+                return redirect()
+                    ->route('cita.index')
+                    ->with('error', $mensaje);
+            }
         }
 
         // Obtener la historia clínica completa de la mascota.
@@ -86,17 +108,27 @@ class CitaController extends Controller
 
         // Cambiar el estado al iniciar la atención.
         if ($cita->estado === 'Confirmada') {
-            $this->cita_service->update($id, [
-                'estado' => 'En atención',
-            ]);
+            try {
+                $this->cita_service->validarVentanaAtencion($id);
+
+                $this->cita_service->update($id, [
+                    'estado' => 'En atención',
+                ]);
+
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $mensaje = collect($e->errors())->flatten()->first();
+
+                return redirect()
+                    ->route('cita.index')
+                    ->with('error', $mensaje);
+            }
 
             $cita = $this->cita_service->edit($id);
         }
 
-        // Mostrar la historia clínica desde la cita.
-        return view('HistoriaClinica.consulta', compact('cita','historiaClinica'));
+        return view('HistoriaClinica.consulta', compact('cita', 'historiaClinica'));
     }
-        
+            
     public function edit(int $id)
     {
         $cita = $this->cita_service->edit($id);
@@ -126,7 +158,15 @@ class CitaController extends Controller
         // Registrar que la mascota no asistió.
         if ($accion === 'no_asistio') {
 
-            $this->cita_service->marcarNoAsistio($id);
+            try {
+                $this->cita_service->marcarNoAsistio($id);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $mensaje = collect($e->errors())->flatten()->first();
+
+                return redirect()
+                    ->route('cita.index')
+                    ->with('error', $mensaje);
+            }
 
             return redirect()
                 ->route('cita.index')
@@ -141,12 +181,6 @@ class CitaController extends Controller
         $this->cita_service->finalizarConsulta($id, $request->validated());
 
         return redirect()->route('cita.index')->with('success', 'Consulta finalizada correctamente.');
-    }
-
-    public function destroy(int $id)
-    {
-        $this->cita_service->destroy($id);
-        return redirect()->route('cita.index')->with('destroy', 'Cita eliminada correctamente');
     }
 
     private function validarDiagnosticos($validador, Request $request): void
@@ -185,8 +219,15 @@ class CitaController extends Controller
 
     public function marcarNoAsistio(int $id)
     {
-        // Registrar la inasistencia mediante el servicio.
-        $this->cita_service->marcarNoAsistio($id);
+        try {
+            $this->cita_service->marcarNoAsistio($id);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $mensaje = collect($e->errors())->flatten()->first();
+
+            return redirect()
+                ->route('cita.index')
+                ->with('error', $mensaje);
+        }
 
         return redirect()
             ->route('cita.index')
