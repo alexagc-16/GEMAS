@@ -31,6 +31,12 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('historiaclinica', HistoriaClinicaController::class)->except(['destroy'])->names('historiaclinica')->middleware('modulo:historiaclinica');
 
+    Route::get(
+        '/historiaclinica/{historiaclinica}/pdf',
+        [HistoriaClinicaController::class, 'descargarPdf']
+    )->name('historiaclinica.pdf')
+    ->middleware('modulo:historiaclinica');
+
     Route::resource('servicio', ServicioController::class)->names('servicio')->middleware('modulo:servicio');
 
     Route::resource('veterinario', VeterinarioController::class)->names('veterinario')->middleware('modulo:veterinario');
