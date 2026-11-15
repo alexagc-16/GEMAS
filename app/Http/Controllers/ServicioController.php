@@ -15,10 +15,13 @@ class ServicioController extends Controller
     public function __construct(ServicioService $servicioservice) {
         $this->servicio_service = $servicioservice;  
     }
-    
-    public function index()
+
+    public function index(Request $request)
     {
-        $servicios = $this->servicio_service->listarPaginado(10);
+        $filtros = $request->only(['buscar', 'tiempo']);
+
+        $servicios = $this->servicio_service->listarPaginado(10, $filtros);
+
         return view('Servicio.index', compact('servicios'));
     }
 

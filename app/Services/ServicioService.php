@@ -13,8 +13,9 @@ class ServicioService{
         $this->servicio_repository = $serviciorepository;
     }
 
-    public function listarPaginado(int $porPagina = 10){
-        return $this->servicio_repository->listarPaginado($porPagina);
+    public function listarPaginado(int $porPagina = 10, array $filtros = [])
+    {
+        return $this->servicio_repository->listarPaginado($porPagina, $filtros);
     }
 
     public function listarTodo(){
