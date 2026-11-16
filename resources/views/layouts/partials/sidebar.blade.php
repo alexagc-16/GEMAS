@@ -130,6 +130,13 @@
                             ],
 
                         [
+                            'label' => 'Catálogo de Mascotas',
+                            'route' => 'mascotasAdopcion.index',
+                            'icon' => 'adopcion',
+                            'can' => [' ver mascotaadopcion'],
+                            ],
+
+                        [
                             'label' => 'Gestion Usuarios',
                             'route' => 'seguridad.permisos.index',
                             'icon' => 'gestion',

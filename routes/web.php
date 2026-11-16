@@ -15,7 +15,7 @@ use App\Http\Controllers\VeterinarioController;
 use App\Http\Controllers\MiPerfilController;
 use App\Http\Controllers\Seguridad\AuthController;
 use App\Http\Controllers\CatalogoMascotaController;
-
+use App\Http\Controllers\MascotaAdopcionController;
 
 Route::get('/', [CatalogoMascotaController::class, 'index'])
     ->name('catalogo.index');
@@ -95,4 +95,25 @@ Route::middleware('guest')->group(function () {
 
     Route::post('/registro', [AuthController::class, 'register'])
         ->name('registro.store');
+});
+
+// Administración de mascotas del catálogo.
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/mascotas-adopcion', [MascotaAdopcionController::class, 'index'])
+        ->name('mascotasAdopcion.index');
+
+    Route::get('/mascotas-adopcion/create', [MascotaAdopcionController::class, 'create'])
+        ->name('mascotasAdopcion.create');
+
+    Route::post('/mascotas-adopcion', [MascotaAdopcionController::class, 'store'])
+        ->name('mascotasAdopcion.store');
+
+    Route::get('/mascotas-adopcion/{id}/edit', [MascotaAdopcionController::class, 'edit'])
+        ->name('mascotasAdopcion.edit');
+
+    Route::put('/mascotas-adopcion/{id}', [MascotaAdopcionController::class, 'update'])
+        ->name('mascotasAdopcion.update');
+
+    Route::delete('/mascotas-adopcion/{id}', [MascotaAdopcionController::class, 'destroy'])
+        ->name('mascotasAdopcion.destroy');
 });

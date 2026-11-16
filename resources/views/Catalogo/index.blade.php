@@ -223,318 +223,168 @@
             </p>
 
 
-
-            
-            {{-- TARJETAS --}}
+            {{-- TARJETAS DINÁMICAS --}}
             <div id="contenedorMascotas"
                 class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                {{-- MASCOTA 1: MAX --}}
-                <article data-mascota
-                    data-especie="perro"
-                    data-sexo="macho"
-                    class="bg-white rounded-3xl overflow-hidden
-                        border border-slate-100 shadow-sm
-                        hover:shadow-xl hover:-translate-y-1
-                        transition duration-300">
+                @forelse ($mascotas as $mascota)
 
-                    <div class="relative h-72 overflow-hidden">
-                        <img src="{{ asset('img/catalogo/mascota-1.jpg') }}"
-                            alt="Max, perro en adopción"
-                            class="w-full h-full object-contain hover:scale-105 transition duration-500">
+                    <article data-mascota
+                        data-especie="{{ strtolower($mascota->especie) }}"
+                        data-sexo="{{ strtolower($mascota->sexo) }}"
+                        class="bg-white rounded-3xl overflow-hidden
+                            border border-slate-100 shadow-sm
+                            hover:shadow-xl hover:-translate-y-1
+                            transition duration-300">
 
-                        <span class="absolute top-4 left-4 bg-gemas-600 text-white
-                                    text-xs font-bold px-4 py-2 rounded-full">
-                            En adopción
-                        </span>
-                    </div>
+                        {{-- Imagen --}}
+                        <div class="relative h-72 overflow-hidden bg-slate-50">
 
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-2xl font-extrabold text-slate-800">Max</h3>
+                            @if ($mascota->imagen)
+                                <img src="{{ Storage::url($mascota->imagen) }}"
+                                    alt="{{ $mascota->nombre }}"
+                                    class="w-full h-full object-contain
+                                        hover:scale-105 transition duration-500">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <svg class="w-20 h-20 text-slate-300"
+                                        fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="1.5"
+                                            d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0H5Z"/>
+                                    </svg>
+                                </div>
+                            @endif
 
-                            <span class="text-xs font-semibold text-gemas-700
-                                        bg-gemas-50 px-3 py-2 rounded-full">
-                                Perro
+                            <span class="absolute top-4 left-4 bg-gemas-600 text-white
+                                text-xs font-bold px-4 py-2 rounded-full">
+                                En adopción
                             </span>
+
                         </div>
 
-                        <p class="text-sm text-slate-500 mb-5">
-                            Un compañero alegre, cariñoso y lleno de energía.
+                        {{-- Información --}}
+                        <div class="p-6">
+
+                            <div class="flex items-center justify-between mb-3">
+
+                                <h3 class="text-2xl font-extrabold text-slate-800">
+                                    {{ $mascota->nombre }}
+                                </h3>
+
+                                <span class="text-xs font-semibold text-gemas-700
+                                    bg-gemas-50 px-3 py-2 rounded-full">
+                                    {{ $mascota->especie }}
+                                </span>
+
+                            </div>
+                            
+                            {{-- Descripción de la mascota --}}
+                            <div class="mb-5">
+                                <p class="text-sm text-slate-500 leading-relaxed"
+                                data-descripcion-corta>
+                                    {{ Str::limit($mascota->descripcion, 120) }}
+                                </p>
+
+                                <p class="text-sm text-slate-500 leading-relaxed hidden"
+                                data-descripcion-completa>
+                                    {{ $mascota->descripcion }}
+                                </p>
+
+                                @if (strlen($mascota->descripcion) > 120)
+                                    <button type="button"
+                                        data-ver-mas
+                                        class="text-sm font-bold text-gemas-600 hover:text-gemas-800 mt-2 transition">
+                                        Ver más
+                                    </button>
+                                @endif
+                            </div>
+
+
+                            {{-- Características --}}
+                            <div class="flex flex-wrap items-center gap-3
+                                border-t border-slate-100 pt-4 mb-6">
+
+                                {{-- Sexo --}}
+                                <span class="inline-flex items-center gap-1.5
+                                    text-sm text-slate-600 bg-slate-50
+                                    px-3 py-2 rounded-lg">
+
+                                    <span class="font-bold">
+                                        {{ $mascota->sexo === 'Macho' ? '♂' : '♀' }}
+                                    </span>
+
+                                    {{ $mascota->sexo }}
+
+                                </span>
+
+                                {{-- Raza --}}
+                                @if ($mascota->raza)
+                                    <span class="inline-flex items-center
+                                        text-sm text-slate-600 bg-slate-50
+                                        px-3 py-2 rounded-lg">
+
+                                        {{ $mascota->raza }}
+
+                                    </span>
+                                @endif
+
+                                {{-- Edad --}}
+                                @if ($mascota->fechaNacimiento)
+                                    @php
+                                        $edad = \Carbon\Carbon::parse($mascota->fechaNacimiento);
+                                        $anios = $edad->age;
+                                        $meses = $edad->diffInMonths(now()) % 12;
+                                    @endphp
+
+                                    <span class="inline-flex items-center
+                                        text-sm text-slate-600 bg-slate-50
+                                        px-3 py-2 rounded-lg">
+
+                                        @if ($anios > 0)
+                                            {{ $anios }} {{ $anios === 1 ? 'año' : 'años' }}
+                                        @else
+                                            {{ $meses }} {{ $meses === 1 ? 'mes' : 'meses' }}
+                                        @endif
+
+                                    </span>
+                                @endif
+
+                            </div>
+
+                            {{-- Contacto --}}
+                            <a href="https://wa.me/573124539172?text={{ urlencode('Hola, estoy interesado en adoptar a ' . $mascota->nombre . '.') }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="block text-center bg-gemas-50 hover:bg-gemas-600
+                                    text-gemas-700 hover:text-white font-bold
+                                    py-3 rounded-xl transition">
+
+                                Me interesa
+
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                @empty
+
+                    <div class="col-span-full text-center py-12">
+                        <p class="text-lg font-bold text-slate-700">
+                            Por el momento no hay mascotas en adopción.
                         </p>
 
-                        <div class="flex gap-5 text-sm text-slate-500
-                                    border-t border-slate-100 pt-4 mb-6">
-                            <span>♂ Macho</span>
-                            <span>2 años</span>
-                        </div>
-
-                        <a href="https://wa.me/57NUMERO?text=Hola,%20estoy%20interesado%20en%20adoptar%20a%20Max."
-                            target="_blank" rel="noopener noreferrer"
-                            class="block text-center bg-gemas-50 hover:bg-gemas-600
-                                text-gemas-700 hover:text-white font-bold
-                                py-3 rounded-xl transition">
-                            Me interesa
-                        </a>
-                    </div>
-                </article>
-
-
-                {{-- MASCOTA 2: LUNA --}}
-                <article data-mascota
-                    data-especie="gato"
-                    data-sexo="hembra"
-                    class="bg-white rounded-3xl overflow-hidden
-                        border border-slate-100 shadow-sm
-                        hover:shadow-xl hover:-translate-y-1
-                        transition duration-300">
-
-                    <div class="relative h-72 overflow-hidden">
-                        <img src="{{ asset('img/catalogo/mascota-2.jpg') }}"
-                            alt="Luna, gata en adopción"
-                            class="w-full h-full object-contain hover:scale-105 transition duration-500">
-
-                        <span class="absolute top-4 left-4 bg-gemas-600 text-white
-                                    text-xs font-bold px-4 py-2 rounded-full">
-                            En adopción
-                        </span>
-                    </div>
-
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-2xl font-extrabold text-slate-800">Luna</h3>
-
-                            <span class="text-xs font-semibold text-gemas-700
-                                        bg-gemas-50 px-3 py-2 rounded-full">
-                                Gato
-                            </span>
-                        </div>
-
-                        <p class="text-sm text-slate-500 mb-5">
-                            Una pequeña dulce y tranquila que busca compañía.
+                        <p class="text-sm text-slate-500 mt-2">
+                            Pronto tendremos nuevos amigos buscando un hogar.
                         </p>
-
-                        <div class="flex gap-5 text-sm text-slate-500
-                                    border-t border-slate-100 pt-4 mb-6">
-                            <span>♀ Hembra</span>
-                            <span>1 año</span>
-                        </div>
-
-                        <a href="https://wa.me/57NUMERO?text=Hola,%20estoy%20interesado%20en%20adoptar%20a%20Luna."
-                            target="_blank" rel="noopener noreferrer"
-                            class="block text-center bg-gemas-50 hover:bg-gemas-600
-                                text-gemas-700 hover:text-white font-bold
-                                py-3 rounded-xl transition">
-                            Me interesa
-                        </a>
-                    </div>
-                </article>
-
-
-                {{-- MASCOTA 3: ROCKY --}}
-                <article data-mascota
-                    data-especie="perro"
-                    data-sexo="macho"
-                    class="bg-white rounded-3xl overflow-hidden
-                        border border-slate-100 shadow-sm
-                        hover:shadow-xl hover:-translate-y-1
-                        transition duration-300">
-
-                    <div class="relative h-72 overflow-hidden">
-                        <img src="{{ asset('img/catalogo/mascota-3.jpg') }}"
-                            alt="Rocky, perro en adopción"
-                            class="w-full h-full object-contain hover:scale-105 transition duration-500">
-
-                        <span class="absolute top-4 left-4 bg-gemas-600 text-white
-                                    text-xs font-bold px-4 py-2 rounded-full">
-                            En adopción
-                        </span>
                     </div>
 
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-2xl font-extrabold text-slate-800">Rocky</h3>
-
-                            <span class="text-xs font-semibold text-gemas-700
-                                        bg-gemas-50 px-3 py-2 rounded-full">
-                                Perro
-                            </span>
-                        </div>
-
-                        <p class="text-sm text-slate-500 mb-5">
-                            Un amigo fiel, juguetón y listo para conocer su hogar.
-                        </p>
-
-                        <div class="flex gap-5 text-sm text-slate-500
-                                    border-t border-slate-100 pt-4 mb-6">
-                            <span>♂ Macho</span>
-                            <span>4 años</span>
-                        </div>
-
-                        <a href="https://wa.me/57NUMERO?text=Hola,%20estoy%20interesado%20en%20adoptar%20a%20Rocky."
-                            target="_blank" rel="noopener noreferrer"
-                            class="block text-center bg-gemas-50 hover:bg-gemas-600
-                                text-gemas-700 hover:text-white font-bold
-                                py-3 rounded-xl transition">
-                            Me interesa
-                        </a>
-                    </div>
-                </article>
-
-
-                {{-- MASCOTA 4: BELLA --}}
-                <article data-mascota
-                    data-especie="perro"
-                    data-sexo="hembra"
-                    class="bg-white rounded-3xl overflow-hidden
-                        border border-slate-100 shadow-sm
-                        hover:shadow-xl hover:-translate-y-1
-                        transition duration-300">
-
-                    <div class="relative h-72 overflow-hidden">
-                        <img src="{{ asset('img/catalogo/mascota-1.jpg') }}"
-                            alt="Bella, perrita en adopción"
-                            class="w-full h-full object-contain hover:scale-105 transition duration-500">
-
-                        <span class="absolute top-4 left-4 bg-gemas-600 text-white
-                                    text-xs font-bold px-4 py-2 rounded-full">
-                            En adopción
-                        </span>
-                    </div>
-
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-2xl font-extrabold text-slate-800">Bella</h3>
-
-                            <span class="text-xs font-semibold text-gemas-700
-                                        bg-gemas-50 px-3 py-2 rounded-full">
-                                Perro
-                            </span>
-                        </div>
-
-                        <p class="text-sm text-slate-500 mb-5">
-                            Una compañera cariñosa que espera una familia.
-                        </p>
-
-                        <div class="flex gap-5 text-sm text-slate-500
-                                    border-t border-slate-100 pt-4 mb-6">
-                            <span>♀ Hembra</span>
-                            <span>3 años</span>
-                        </div>
-
-                        <a href="https://wa.me/57NUMERO?text=Hola,%20estoy%20interesado%20en%20adoptar%20a%20Bella."
-                            target="_blank" rel="noopener noreferrer"
-                            class="block text-center bg-gemas-50 hover:bg-gemas-600
-                                text-gemas-700 hover:text-white font-bold
-                                py-3 rounded-xl transition">
-                            Me interesa
-                        </a>
-                    </div>
-                </article>
-
-
-                {{-- MASCOTA 5: SIMBA --}}
-                <article data-mascota
-                    data-especie="gato"
-                    data-sexo="macho"
-                    class="bg-white rounded-3xl overflow-hidden
-                        border border-slate-100 shadow-sm
-                        hover:shadow-xl hover:-translate-y-1
-                        transition duration-300">
-
-                    <div class="relative h-72 overflow-hidden">
-                        <img src="{{ asset('img/catalogo/mascota-2.jpg') }}"
-                            alt="Simba, gato en adopción"
-                            class="w-full h-full object-contain hover:scale-105 transition duration-500">
-
-                        <span class="absolute top-4 left-4 bg-gemas-600 text-white
-                                    text-xs font-bold px-4 py-2 rounded-full">
-                            En adopción
-                        </span>
-                    </div>
-
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-2xl font-extrabold text-slate-800">Simba</h3>
-
-                            <span class="text-xs font-semibold text-gemas-700
-                                        bg-gemas-50 px-3 py-2 rounded-full">
-                                Gato
-                            </span>
-                        </div>
-
-                        <p class="text-sm text-slate-500 mb-5">
-                            Un pequeño curioso, juguetón y lleno de ternura.
-                        </p>
-
-                        <div class="flex gap-5 text-sm text-slate-500
-                                    border-t border-slate-100 pt-4 mb-6">
-                            <span>♂ Macho</span>
-                            <span>2 años</span>
-                        </div>
-
-                        <a href="https://wa.me/57NUMERO?text=Hola,%20estoy%20interesado%20en%20adoptar%20a%20Simba."
-                            target="_blank" rel="noopener noreferrer"
-                            class="block text-center bg-gemas-50 hover:bg-gemas-600
-                                text-gemas-700 hover:text-white font-bold
-                                py-3 rounded-xl transition">
-                            Me interesa
-                        </a>
-                    </div>
-                </article>
-
-
-                {{-- MASCOTA 6: NALA --}}
-                <article data-mascota
-                    data-especie="gato"
-                    data-sexo="hembra"
-                    class="bg-white rounded-3xl overflow-hidden
-                        border border-slate-100 shadow-sm
-                        hover:shadow-xl hover:-translate-y-1
-                        transition duration-300">
-
-                    <div class="relative h-72 overflow-hidden">
-                        <img src="{{ asset('img/catalogo/mascota-3.jpg') }}"
-                            alt="Nala, gata en adopción"
-                            class="w-full h-full object-contain hover:scale-105 transition duration-500">
-
-                        <span class="absolute top-4 left-4 bg-gemas-600 text-white
-                                    text-xs font-bold px-4 py-2 rounded-full">
-                            En adopción
-                        </span>
-                    </div>
-
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-2xl font-extrabold text-slate-800">Nala</h3>
-
-                            <span class="text-xs font-semibold text-gemas-700
-                                        bg-gemas-50 px-3 py-2 rounded-full">
-                                Gato
-                            </span>
-                        </div>
-
-                        <p class="text-sm text-slate-500 mb-5">
-                            Una gatita dulce y tranquila que busca un hogar.
-                        </p>
-
-                        <div class="flex gap-5 text-sm text-slate-500
-                                    border-t border-slate-100 pt-4 mb-6">
-                            <span>♀ Hembra</span>
-                            <span>1 año</span>
-                        </div>
-
-                        <a href="https://wa.me/57NUMERO?text=Hola,%20estoy%20interesado%20en%20adoptar%20a%20Nala."
-                            target="_blank" rel="noopener noreferrer"
-                            class="block text-center bg-gemas-50 hover:bg-gemas-600
-                                text-gemas-700 hover:text-white font-bold
-                                py-3 rounded-xl transition">
-                            Me interesa
-                        </a>
-                    </div>
-                </article>
+                @endforelse
 
             </div>
+
 
             {{-- PAGINACIÓN --}}
             <div id="paginacion"
@@ -854,6 +704,45 @@
                     mostrarMascotas();
                 }
             });
+
+        });
+
+        // Ver más / Ver menos de cada tarjeta
+        document.addEventListener('click', function (e) {
+
+            const boton = e.target.closest('[data-ver-mas]');
+
+            if (!boton) return;
+
+            // Identificar únicamente la tarjeta del botón pulsado
+            const tarjeta = boton.closest('[data-mascota]');
+
+            if (!tarjeta) return;
+
+            const descripcionCorta = tarjeta.querySelector(
+                '[data-descripcion-corta]'
+            );
+
+            const descripcionCompleta = tarjeta.querySelector(
+                '[data-descripcion-completa]'
+            );
+
+            const estaExpandida = !descripcionCompleta.classList.contains('hidden');
+
+            if (estaExpandida) {
+
+                descripcionCompleta.classList.add('hidden');
+                descripcionCorta.classList.remove('hidden');
+
+                boton.textContent = 'Ver más';
+
+            } else {
+
+                descripcionCorta.classList.add('hidden');
+                descripcionCompleta.classList.remove('hidden');
+
+                boton.textContent = 'Ver menos';
+            }
 
         });
     </script>
