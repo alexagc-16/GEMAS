@@ -18,6 +18,11 @@ class MascotaAdopcionRepository
         return MascotaAdopcion::create($datos);
     }
 
+    public function obtenerPorId(int $id)
+    {
+        return MascotaAdopcion::findOrFail($id);
+    }
+
     // Consultar una mascota por su ID.
     public function edit(int $id)
     {
@@ -32,14 +37,6 @@ class MascotaAdopcionRepository
         $mascota->update($datos);
 
         return $mascota;
-    }
-
-    // Eliminar una mascota.
-    public function delete(int $id)
-    {
-        $mascota = $this->edit($id);
-
-        return $mascota->delete();
     }
 
     // Consultar únicamente las mascotas disponibles para adopción.

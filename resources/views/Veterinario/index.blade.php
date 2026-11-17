@@ -268,7 +268,7 @@
                                                     flex items-center justify-center text-[#40899A]">
 
                                             @include('layouts.partials.icons', [
-                                                'icon' => 'usuario'
+                                                'icon' => 'veterinario'
                                             ])
 
                                         </div>

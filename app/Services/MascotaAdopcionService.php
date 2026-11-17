@@ -30,6 +30,11 @@ class MascotaAdopcionService
         return $this->mascota_adopcion_repository->store($datos);
     }
 
+    public function obtenerPorId(int $id)
+    {
+        return $this->mascota_adopcion_repository->obtenerPorId($id);
+    }
+
     // Consultar una mascota por su ID.
     public function edit(int $id)
     {
@@ -58,20 +63,6 @@ class MascotaAdopcionService
         }
 
         return $mascotaActualizada;
-    }
-
-    // Eliminar una mascota y su fotografía.
-    public function delete(int $id)
-    {
-        $mascota = $this->mascota_adopcion_repository->edit($id);
-
-        $eliminado = $this->mascota_adopcion_repository->delete($id);
-
-        if ($eliminado) {
-            Storage::disk('public')->delete($mascota->imagen);
-        }
-
-        return $eliminado;
     }
 
     // Consultar las mascotas que están en adopción.

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MascotaAdopcionStoreRequest;
+use App\Models\MascotaAdopcion;
 use App\Services\MascotaAdopcionService;
 
 class MascotaAdopcionController extends Controller
@@ -40,6 +41,13 @@ class MascotaAdopcionController extends Controller
             ->with('success', 'Mascota registrada correctamente.');
     }
 
+    public function show(int $id)
+    {
+        $mascota = $this->mascota_adopcion_service->obtenerPorId($id);
+
+        return view('MascotaAdopcion.index', compact('mascota'));
+    }
+
     // Mostrar formulario de edición.
     public function edit(int $id)
     {
@@ -58,16 +66,6 @@ class MascotaAdopcionController extends Controller
         return redirect()
             ->route('mascotasAdopcion.index')
             ->with('success', 'Mascota actualizada correctamente.');
-    }
-
-    // Eliminar una mascota.
-    public function destroy(int $id)
-    {
-        $this->mascota_adopcion_service->delete($id);
-
-        return redirect()
-            ->route('mascotasAdopcion.index')
-            ->with('success', 'Mascota eliminada correctamente.');
     }
 
     // Mostrar únicamente las mascotas disponibles para adopción.

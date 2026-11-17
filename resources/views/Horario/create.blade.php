@@ -286,7 +286,7 @@
                                    text-sm font-semibold text-white
                                    hover:bg-[#347787] transition">
 
-                            Guardar horario
+                            Registrar horario
 
                         </button>
 

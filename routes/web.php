@@ -99,21 +99,7 @@ Route::middleware('guest')->group(function () {
 
 // Administración de mascotas del catálogo.
 Route::middleware(['auth'])->prefix('admin')->group(function () {
-    Route::get('/mascotas-adopcion', [MascotaAdopcionController::class, 'index'])
-        ->name('mascotasAdopcion.index');
-
-    Route::get('/mascotas-adopcion/create', [MascotaAdopcionController::class, 'create'])
-        ->name('mascotasAdopcion.create');
-
-    Route::post('/mascotas-adopcion', [MascotaAdopcionController::class, 'store'])
-        ->name('mascotasAdopcion.store');
-
-    Route::get('/mascotas-adopcion/{id}/edit', [MascotaAdopcionController::class, 'edit'])
-        ->name('mascotasAdopcion.edit');
-
-    Route::put('/mascotas-adopcion/{id}', [MascotaAdopcionController::class, 'update'])
-        ->name('mascotasAdopcion.update');
-
-    Route::delete('/mascotas-adopcion/{id}', [MascotaAdopcionController::class, 'destroy'])
-        ->name('mascotasAdopcion.destroy');
+    Route::resource('mascotas-adopcion', MascotaAdopcionController::class)
+        ->parameters(['mascotas-adopcion' => 'id'])
+        ->names('mascotasAdopcion');
 });
