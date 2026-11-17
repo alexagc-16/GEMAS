@@ -377,14 +377,16 @@
                                             Las historias clínicas de las mascotas aparecerán aquí.
                                         </p>
 
-                                        <a href="{{ route('historiaclinica.create') }}"
-                                            class="mt-5 inline-flex items-center gap-2 rounded-lg
-                                                bg-[#40899A] px-4 py-2.5 text-sm font-semibold
-                                                text-white transition hover:bg-[#347787]">
+                                        @if(auth()->user()->can('crearhistoria'))
+                                            <a href="{{ route('historiaclinica.create') }}"
+                                                class="mt-5 inline-flex items-center gap-2 rounded-lg
+                                                    bg-[#40899A] px-4 py-2.5 text-sm font-semibold
+                                                    text-white transition hover:bg-[#347787]">
 
-                                            Completar primera historia clínica
+                                                Completar primera historia clínica
 
-                                        </a>
+                                            </a>
+                                        @endif
 
                                     </td>
                                 </tr>

@@ -281,14 +281,16 @@
                                             Cuando registres un veterinario, aparecerá aquí.
                                         </p>
 
-                                        <a href="{{ route('veterinario.create') }}"
-                                            class="inline-flex items-center gap-2 mt-5 rounded-lg
-                                                bg-[#40899A] px-4 py-2.5 text-sm font-semibold
-                                                text-white hover:bg-[#347787] transition">
+                                        @if(auth()->user()->can('crearveterinario'))
+                                            <a href="{{ route('veterinario.create') }}"
+                                                class="inline-flex items-center gap-2 mt-5 rounded-lg
+                                                    bg-[#40899A] px-4 py-2.5 text-sm font-semibold
+                                                    text-white hover:bg-[#347787] transition">
 
-                                            Registrar primer veterinario
+                                                Registrar primer veterinario
 
-                                        </a>
+                                            </a>
+                                        @endif
 
                                     </td>
                                 </tr>

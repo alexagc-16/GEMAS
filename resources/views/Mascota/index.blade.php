@@ -283,11 +283,11 @@
                                         </p>
 
                                         <a href="{{ route('mascota.create') }}"
-                                            class="mt-4 inline-flex items-center gap-2 rounded-lg
-                                                bg-teal-700 px-4 py-2.5 text-sm font-semibold
-                                                text-white transition hover:bg-teal-800">
+                                            class="inline-flex items-center gap-2 mt-4
+                                                rounded-lg bg-primary-600 px-4 py-2.5
+                                                text-sm font-semibold text-white
+                                                hover:bg-primary-700 transition">
 
-                                            <span class="text-lg leading-none">+</span>
                                             Registrar primera mascota
 
                                         </a>

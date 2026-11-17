@@ -187,19 +187,36 @@
 
                             </tr>
                         @empty
+                            {{-- Sin mascotas --}}
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center">
-                                    <div class="flex flex-col items-center">
-                                        <i class="fa-solid fa-paw mb-3 text-4xl text-slate-300"></i>
+                                <td colspan="{{ auth()->user()->hasRole('administrador') ? 7 : 6 }}"
+                                    class="px-6 py-12 text-center">
 
-                                        <p class="font-semibold text-slate-600">
-                                            No hay mascotas registradas
-                                        </p>
+                                    <div class="mx-auto flex h-14 w-14 items-center justify-center
+                                                rounded-full bg-[#EAF4F5] text-[#40899A]">
 
-                                        <p class="mt-1 text-sm text-slate-400">
-                                            Las mascotas registradas aparecerán en este listado.
-                                        </p>
+                                        @include('layouts.partials.icons', ['icon' => 'adopcion'])
+
                                     </div>
+
+                                    <h3 class="mt-4 text-base font-semibold text-slate-800">
+                                        No hay mascotas en adopcion registradas
+                                    </h3>
+
+                                    <p class="mt-1 text-sm text-slate-500">
+                                        Cuando registres una mascota, aparecerá aquí.
+                                    </p>
+
+                                    <a href="{{ route('mascotasAdopcion.create') }}"
+                                        class="inline-flex items-center gap-2 mt-4
+                                            rounded-lg bg-primary-600 px-4 py-2.5
+                                            text-sm font-semibold text-white
+                                            hover:bg-primary-700 transition">
+
+                                        Registrar primera mascota
+
+                                    </a>
+
                                 </td>
                             </tr>
                         @endforelse
