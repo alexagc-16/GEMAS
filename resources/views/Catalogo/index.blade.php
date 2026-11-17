@@ -3,18 +3,25 @@
     // Número de WhatsApp con código de país, sin espacios ni signos.
     $whatsapp = '573124539172';
 @endphp
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gemas | Adopta una mascota</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        html {
+            scroll-padding-top: 120px;
+        }
+    </style>
 </head>
 
 <body class="bg-[#F7FAF9] text-slate-800">
 
+    
     {{-- NAVBAR --}}
-    <header class="bg-white border-b border-slate-100">
+    <header id="navbar" class="sticky top-0 z-50 bg-white border-b border-slate-100">
+
         <nav class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
 
             <a href="{{ route('catalogo.index') }}" class="flex items-center gap-3">
@@ -24,20 +31,38 @@
 
                 <div>
                     <img src="{{ asset('img/letras.png') }}"
-                    alt="GEMAS"
-                    class="h-8 w-auto object-contain">
+                        alt="GEMAS"
+                        class="h-8 w-auto object-contain">
                     <p class="text-[10px] tracking-[0.2em] text-slate-400 font-semibold">
                         AMOR Y CUIDADO ANIMAL
                     </p>
                 </div>
             </a>
 
+            {{-- ENLACES --}}
             <div class="hidden md:flex items-center gap-9 text-sm font-semibold text-slate-600">
-                <a href="#inicio" class="hover:text-gemas-600 transition">Inicio</a>
-                <a href="#mascotas" class="hover:text-gemas-600 transition">Adopta</a>
-                <a href="#donaciones" class="hover:text-gemas-600 transition">Donaciones</a>
+
+                <a href="#inicio"
+                    data-seccion="inicio"
+                    class="hover:text-gemas-600 transition">
+                    Inicio
+                </a>
+
+                <a href="#mascotas"
+                    data-seccion="mascotas"
+                    class="hover:text-gemas-600 transition">
+                    Adopta
+                </a>
+
+                <a href="#donaciones"
+                    data-seccion="donaciones"
+                    class="hover:text-gemas-600 transition">
+                    Donaciones
+                </a>
+
             </div>
 
+            {{-- BOTONES --}}
             <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-4 sm:flex-row sm:justify-end">
 
                 <a href="{{ route('registro') }}"
@@ -51,13 +76,12 @@
                 </a>
 
             </div>
+
         </nav>
     </header>
 
-
     {{-- PORTADA --}}
     <main>
-
         <section id="inicio" class="max-w-7xl mx-auto px-5 pt-8">
 
             <div class="relative min-h-[490px] md:min-h-[550px] rounded-[2rem] overflow-hidden
@@ -502,6 +526,20 @@
 
     
     <script>
+        // Ajustar automáticamente el desplazamiento según la altura del navbar
+        const navbar = document.getElementById('navbar');
+
+        function actualizarAlturaNavbar() {
+            document.documentElement.style.setProperty(
+                '--altura-navbar',
+                `${navbar.offsetHeight + 15}px`
+            );
+        }
+
+        actualizarAlturaNavbar();
+
+        window.addEventListener('resize', actualizarAlturaNavbar);
+
         document.addEventListener('DOMContentLoaded', function () {
 
             // Elementos de los filtros
@@ -745,8 +783,55 @@
             }
 
         });
-    </script>
 
+        // Cambiar el color del enlace según la sección visible
+        const enlacesNavbar = document.querySelectorAll('[data-seccion]');
+
+        const secciones = document.querySelectorAll(
+            '#inicio, #mascotas, #donaciones'
+        );
+
+        const observadorSecciones = new IntersectionObserver(
+            (entries) => {
+
+                entries.forEach((entry) => {
+
+                    if (entry.isIntersecting) {
+
+                        enlacesNavbar.forEach((enlace) => {
+
+                            enlace.classList.remove(
+                                'text-gemas-700',
+                                'font-bold'
+                            );
+
+                            enlace.classList.add('text-slate-600');
+
+                            if (enlace.dataset.seccion === entry.target.id) {
+
+                                enlace.classList.remove('text-slate-600');
+
+                                enlace.classList.add(
+                                    'text-gemas-700',
+                                    'font-bold'
+                                );
+                            }
+                        });
+                    }
+
+                });
+
+            },
+            {
+                rootMargin: '-120px 0px -65% 0px',
+                threshold: 0
+            }
+        );
+
+        secciones.forEach((seccion) => {
+            observadorSecciones.observe(seccion);
+        });
+    </script>
 
 </body>
 </html>
