@@ -308,7 +308,7 @@
                                         </a>
 
                                         {{-- Completar historia clínica --}}
-                                        @if($historiaClinica->completadaEn === null)
+                                        @if($historiaClinica->completadaEn === null && !auth()->user()->tieneRolActivo('usuario'))
 
                                             <a href="{{ route('historiaclinica.edit', $historiaClinica->id) }}"
                                                 class="inline-flex h-9 w-9 items-center justify-center
