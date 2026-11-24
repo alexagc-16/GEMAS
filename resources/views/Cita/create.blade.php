@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
- 
+
     <div class="w-full max-w-3xl mx-auto space-y-6">
 
         {{-- Encabezado --}}
@@ -57,7 +57,32 @@
 
                 <div class="space-y-6 p-6">
 
-                    {{-- Fecha y hora --}}
+                    {{-- Veterinario --}}
+                    <div>
+                        <label for="idVeterinario" class="mb-2 block text-sm font-medium text-slate-700">
+                            Veterinario <span class="text-red-500">*</span>
+                        </label>
+
+                        <select
+                            id="idVeterinario"
+                            name="idVeterinario"
+                            required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
+                        >
+                            <option value="">Selecciona un veterinario</option>
+
+                            @foreach ($veterinarios as $veterinario)
+                                <option
+                                    value="{{ $veterinario->id }}"
+                                    {{ (string) old('idVeterinario') === (string) $veterinario->id ? 'selected' : '' }}
+                                >
+                                    {{ $veterinario->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Fecha y horario --}}
                     <div>
                         <h4 class="mb-4 text-sm font-semibold text-slate-700">
                             Fecha y horario
@@ -65,6 +90,7 @@
 
                         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
 
+                            {{-- Fecha --}}
                             <div>
                                 <label for="fecha" class="mb-2 block text-sm font-medium text-slate-700">
                                     Fecha <span class="text-red-500">*</span>
@@ -81,6 +107,7 @@
                                 >
                             </div>
 
+                            {{-- Hora --}}
                             <div>
                                 <label for="hora" class="mb-2 block text-sm font-medium text-slate-700">
                                     Hora <span class="text-red-500">*</span>
@@ -92,10 +119,35 @@
                                     name="hora"
                                     value="{{ old('hora') }}"
                                     required
-                                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
+                                    disabled
+                                    class="w-full rounded-lg border border-slate-300 bg-slate-100 px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100 disabled:cursor-not-allowed"
                                 >
                             </div>
 
+                        </div>
+
+                        {{-- Horario de atención --}}
+                        <div class="mt-5">
+                            <p class="mb-2 text-sm font-medium text-slate-700">
+                                Horario de atención del día
+                            </p>
+
+                            <div
+                                id="horarioInfo"
+                                class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4"
+                            >
+                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-200 text-slate-500">
+                                    @include('layouts.partials.icons', ['icon' => 'horario'])
+                                </div>
+
+                                <div>
+                                    <p id="horarioTexto" class="text-sm font-medium text-slate-600">
+                                        Selecciona un veterinario y una fecha.
+                                    </p>
+
+                                    <p id="diaTexto" class="mt-1 text-xs text-slate-500"></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -140,31 +192,6 @@
                                     {{ (string) old('idMascota') === (string) $mascota->id ? 'selected' : '' }}
                                 >
                                     {{ $mascota->nombre }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    {{-- Veterinario --}}
-                    <div>
-                        <label for="idVeterinario" class="mb-2 block text-sm font-medium text-slate-700">
-                            Veterinario <span class="text-red-500">*</span>
-                        </label>
-
-                        <select
-                            id="idVeterinario"
-                            name="idVeterinario"
-                            required
-                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100"
-                        >
-                            <option value="">Selecciona un veterinario</option>
-
-                            @foreach ($veterinarios as $veterinario)
-                                <option
-                                    value="{{ $veterinario->id }}"
-                                    {{ (string) old('idVeterinario') === (string) $veterinario->id ? 'selected' : '' }}
-                                >
-                                    {{ $veterinario->nombre }}
                                 </option>
                             @endforeach
                         </select>
@@ -218,5 +245,142 @@
             </form>
         </div>
     </div>
+
+    
+    {{-- Horarios de los veterinarios --}}
+    @php
+        $horariosVeterinarios = $veterinarios->mapWithKeys(function ($veterinario) {
+            return [
+                $veterinario->id => $veterinario->Horario->map(function ($horario) {
+                    return [
+                        'diaSemana' => $horario->diaSemana,
+                        'horaInicio' => $horario->horaInicio,
+                        'horaFin' => $horario->horaFin,
+                        'horaAlmuerzoInicio' => $horario->horaAlmuerzoInicio,
+                        'horaAlmuerzoFin' => $horario->horaAlmuerzoFin,
+                    ];
+                })->values()
+            ];
+        });
+    @endphp
+
+    <script>
+        const horariosVeterinarios = @json($horariosVeterinarios);
+
+        const veterinarioSelect = document.getElementById('idVeterinario');
+        const fechaInput = document.getElementById('fecha');
+        const horaInput = document.getElementById('hora');
+
+        const horarioTexto = document.getElementById('horarioTexto');
+        const diaTexto = document.getElementById('diaTexto');
+        const horarioInfo = document.getElementById('horarioInfo');
+
+        const diasSemana = [
+            'domingo',
+            'lunes',
+            'martes',
+            'miércoles',
+            'jueves',
+            'viernes',
+            'sábado'
+        ];
+
+        function formatoHora(hora) {
+            if (!hora) return '';
+
+            const [horas, minutos] = hora.substring(0, 5).split(':');
+
+            const fecha = new Date();
+            fecha.setHours(Number(horas), Number(minutos), 0);
+
+            return fecha.toLocaleTimeString('es-CO', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }).replace(/\./g, '').toUpperCase();
+        }
+
+        function normalizarDia(dia) {
+            return String(dia)
+                .trim()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+        }
+
+        function mostrarHorario() {
+            const idVeterinario = veterinarioSelect.value;
+            const fechaSeleccionada = fechaInput.value;
+
+            horaInput.disabled = true;
+            horaInput.value = '';
+            horaInput.removeAttribute('min');
+            horaInput.removeAttribute('max');
+
+            if (!idVeterinario || !fechaSeleccionada) {
+                horarioTexto.textContent =
+                    'Selecciona un veterinario y una fecha.';
+
+                diaTexto.textContent = '';
+
+                horarioInfo.className =
+                    'flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4';
+
+                return;
+            }
+
+            const [anio, mes, dia] = fechaSeleccionada.split('-').map(Number);
+            const fecha = new Date(anio, mes - 1, dia);
+
+            const diaSemana = diasSemana[fecha.getDay()];
+            const diaNormalizado = normalizarDia(diaSemana);
+
+            const horarios = horariosVeterinarios[idVeterinario] || [];
+
+            const horariosDelDia = horarios.filter(horario =>
+                normalizarDia(horario.diaSemana) === diaNormalizado
+            );
+
+            diaTexto.textContent =
+                fecha.toLocaleDateString('es-CO', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+            if (horariosDelDia.length === 0) {
+                horarioTexto.textContent = 'No hay horario disponible.';
+
+                horarioInfo.className =
+                    'flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4';
+
+                diaTexto.textContent +=
+                    ' · El veterinario no atiende este día.';
+
+                return;
+            }
+
+            const rangos = horariosDelDia.map(horario =>
+                `${formatoHora(horario.horaInicio)} - ${formatoHora(horario.horaFin)}`
+            );
+
+            horarioTexto.textContent = rangos.join(' | ');
+
+            const primerHorario = horariosDelDia[0];
+
+            horaInput.min = primerHorario.horaInicio.substring(0, 5);
+            horaInput.max = primerHorario.horaFin.substring(0, 5);
+            horaInput.disabled = false;
+
+            horarioInfo.className =
+                'flex items-center gap-3 rounded-xl border border-[#C0E0E6] bg-[#EEF6F8] p-4';
+        }
+
+        veterinarioSelect.addEventListener('change', mostrarHorario);
+        fechaInput.addEventListener('change', mostrarHorario);
+
+        mostrarHorario();
+    </script>
 
 @endsection

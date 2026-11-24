@@ -11,7 +11,7 @@ class Veterinario extends Model
     protected $fillable = ['nombre', 'apellido', 'documentoIdentidad', 'telefono', 'email', 'especialidad'];
 
     public function Horario(){
-        return $this->hasMany(Horario::class);
+        return $this->hasMany(Horario::class, 'idVeterinario');
     }
 
     public function Cita(){
