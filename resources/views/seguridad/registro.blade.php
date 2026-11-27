@@ -54,20 +54,24 @@
 
                     @php
                         $campos = [
-                            'nombre' => 'Nombre',
-                            'apellido' => 'Apellido',
-                            'documentoIdentidad' => 'Documento de identidad',
-                            'telefono' => 'Teléfono',
-                            'direccion' => 'Dirección',
-                            'email' => 'Correo electrónico',
+                            'nombre' => ['label' => 'Nombre', 'required' => true],
+                            'apellido' => ['label' => 'Apellido', 'required' => true],
+                            'documentoIdentidad' => ['label' => 'Documento de identidad', 'required' => true],
+                            'telefono' => ['label' => 'Teléfono', 'required' => true],
+                            'direccion' => ['label' => 'Dirección', 'required' => false],
+                            'email' => ['label' => 'Correo electrónico', 'required' => true],
                         ];
                     @endphp
 
                     {{-- Datos personales --}}
-                    @foreach ($campos as $campo => $etiqueta)
+                    @foreach ($campos as $campo => $config)
                         <div>
                             <label for="{{ $campo }}" class="block text-sm font-medium text-slate-700 mb-1">
-                                {{ $etiqueta }}
+                                {{ $config['label'] }}
+
+                                @if ($config['required'])
+                                    <span class="text-red-500">*</span>
+                                @endif
                             </label>
 
                             <input
@@ -75,7 +79,7 @@
                                 name="{{ $campo }}"
                                 id="{{ $campo }}"
                                 value="{{ old($campo) }}"
-                                @if ($campo !== 'direccion') required @endif
+                                @if ($config['required']) required @endif
                                 autocomplete="{{ $campo === 'email' ? 'email' : 'off' }}"
                                 class="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:ring-primary-500 @error($campo) border-red-500 @enderror"
                             >
@@ -89,7 +93,7 @@
                     {{-- Contraseña --}}
                     <div>
                         <label for="password" class="block text-sm font-medium text-slate-700 mb-1">
-                            Contraseña
+                            Contraseña <span class="text-red-500">*</span>
                         </label>
 
                         <div class="relative">
@@ -141,7 +145,7 @@
                     {{-- Confirmar contraseña --}}
                     <div>
                         <label for="password_confirmation" class="block text-sm font-medium text-slate-700 mb-1">
-                            Confirmar contraseña
+                            Confirmar contraseña <span class="text-red-500">*</span>
                         </label>
 
                         <div class="relative">
