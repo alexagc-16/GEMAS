@@ -12,9 +12,6 @@
                 <span class="w-6 h-6 block">@include('layouts.partials.icons', ['icon' => 'menu'])</span>
             </button>
 
-            <h1 class="text-lg sm:text-xl font-semibold text-slate-800 truncate">
-                @yield('page-title', 'Dashboard')
-            </h1>
         </div>
 
         <div class="flex items-center gap-2 sm:gap-4">
@@ -69,43 +66,137 @@
                 </div>
             </div>
 
+            
             {{-- Menú de usuario --}}
             <div x-data="{ open: false }" class="relative">
+
+                @php
+                    $usuarioActual = auth()->user();
+
+                    $nombreCompleto = trim(
+                        $usuarioActual->nombre . ' ' . $usuarioActual->apellido
+                    );
+
+                    $rolActual = $usuarioActual->roles->first()?->name;
+
+                    $nombreRol = match ($rolActual) {
+                        'administrador' => 'Administrador',
+                        'veterinario' => 'Veterinario',
+                        'usuario' => 'Usuario',
+                        default => 'Sin rol asignado',
+                    };
+                @endphp
+
+                {{-- Botón principal --}}
                 <button
                     @click="open = !open"
                     @click.outside="open = false"
                     type="button"
-                    class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg
+                        hover:bg-slate-100 focus:outline-none
+                        focus:ring-2 focus:ring-primary-500"
                     aria-haspopup="true"
-                    :aria-expanded="open.toString()"
-                >
+                    :aria-expanded="open.toString()">
+
+                    {{-- Foto del usuario --}}
                     <img
-                        class="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200"
-                        src="{{ auth()->user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name ?? 'Admin') }}"
-                        alt="Avatar de {{ auth()->user()->name ?? 'Usuario' }}"
-                    >
-                    <span class="hidden sm:block text-sm font-medium text-slate-700">
-                        {{ auth()->user()->name ?? 'Administrador' }}
+                        class="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200"
+                        src="{{ $usuarioActual->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($nombreCompleto) . '&background=EAF4F5&color=306174' }}"
+                        alt="Foto de {{ $nombreCompleto }}">
+
+                    {{-- Nombre y rol --}}
+                    <div class="hidden sm:flex flex-col items-start min-w-0">
+
+                        <span class="text-sm font-semibold text-slate-700 truncate max-w-40">
+                            {{ $nombreCompleto }}
+                        </span>
+
+                        <span class="text-xs text-slate-500">
+                            {{ $nombreRol }}
+                        </span>
+
+                    </div>
+
+                    {{-- Flecha desplegable --}}
+                    <span class="w-4 h-4 text-slate-400 hidden sm:block">
+                        @include('layouts.partials.icons', ['icon' => 'chevron-down'])
                     </span>
-                    <span class="w-4 h-4 text-slate-400 hidden sm:block">@include('layouts.partials.icons', ['icon' => 'chevron-down'])</span>
+
                 </button>
 
+                {{-- Menú desplegable --}}
                 <div
-                    x-show="open" x-cloak
+                    x-show="open"
+                    x-cloak
                     x-transition
-                    class="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden py-1"
+                    class="absolute right-0 mt-2 w-56 bg-white rounded-xl
+                        shadow-lg border border-slate-100 overflow-hidden py-1"
                 >
-                    <a href="{{ Route::has('profile.edit') ? route('profile.edit') : '#' }}" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Mi perfil</a>
-                    <a href="{{ Route::has('settings.index') ? route('settings.index') : '#' }}" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Configuración</a>
-                    <hr class="my-1 border-slate-100">
-                    <form method="POST" action="{{ Route::has('logout') ? route('logout') : '#' }}">
-                        @csrf
-                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                            Cerrar sesión
-                        </button>
-                    </form>
+
+                    {{-- Información del usuario 
+                    <div class="px-4 py-3 border-b border-slate-100 bg-slate-50">
+
+                        <p class="text-sm font-semibold text-slate-800 truncate">
+                            {{ $nombreCompleto }}
+                        </p>
+
+                        <p class="text-xs text-slate-500 mt-1">
+                            {{ $nombreRol }}
+                        </p>
+
+                    </div>--}}
+
+                    {{-- Mi perfil --}}
+                    <a
+                        href="{{ route('perfil.index') }}"
+                        class="flex items-center gap-2 px-4 py-2.5
+                            text-sm text-slate-600 hover:bg-slate-50
+                            hover:text-primary-700 transition"
+                    >
+                        @include('layouts.partials.icons', ['icon' => 'usuario'])
+
+                        Mi perfil
+                    </a>
+
+                    {{-- Cerrar sesión --}}
+                    <div class="border-t border-slate-100">
+
+                        <form
+                            method="POST"
+                            action="{{ Route::has('logout') ? route('logout') : '#' }}"
+                        >
+                            @csrf
+
+                            <button
+                                type="submit"
+                                class="w-full flex items-center gap-2 px-4 py-2.5
+                                    text-sm text-red-600 hover:bg-red-50 transition"
+                            >
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                    />
+                                </svg>
+
+                                Cerrar sesión
+                            </button>
+
+                        </form>
+
+                    </div>
+
                 </div>
+
             </div>
+
         </div>
     </div>
 </header>

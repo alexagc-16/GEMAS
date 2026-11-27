@@ -2,69 +2,144 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cita;
+use App\Models\Veterinario;
+use App\Services\DashService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    /**
-     * Muestra el dashboard principal.
-     *
-     * Reemplaza los valores de ejemplo por consultas reales a tus modelos,
-     * por ejemplo: User::count(), Product::count(), Order::sum('total'), etc.
-     */
+    private DashService $dash_service;
+
+    public function __construct(DashService $dashservice) {
+        $this->dash_service = $dashservice;
+    }
+
+    
     public function index(Request $request)
     {
-        $totalUsers    = 8241;
-        $totalProducts = 1523;
-        $totalSales    = 962;
-        $totalRevenue  = 48920.50;
+        // Identificar el rol del usuario autenticado
+        /** @var \App\Models\Usuario $usuarioActual */
+        $usuarioActual = auth()->guard()->user();
 
-        $recentActivity = [
-            [
-                'avatar'      => 'https://ui-avatars.com/api/?name=Laura+Gomez',
-                'name'        => 'Laura Gómez',
-                'description' => 'Registró un nuevo producto en la categoría Electrónica',
-                'status'      => 'Activo',
-                'date'        => now()->subHours(2)->format('d/m/Y H:i'),
-            ],
-            [
-                'avatar'      => 'https://ui-avatars.com/api/?name=Carlos+Ruiz',
-                'name'        => 'Carlos Ruiz',
-                'description' => 'Solicitud de reembolso pendiente de revisión',
-                'status'      => 'Pendiente',
-                'date'        => now()->subHours(5)->format('d/m/Y H:i'),
-            ],
-            [
-                'avatar'      => 'https://ui-avatars.com/api/?name=Maria+Torres',
-                'name'        => 'María Torres',
-                'description' => 'Cuenta suspendida por incumplimiento de políticas',
-                'status'      => 'Inactivo',
-                'date'        => now()->subDay()->format('d/m/Y H:i'),
-            ],
-            [
-                'avatar'      => 'https://ui-avatars.com/api/?name=Jorge+Diaz',
-                'name'        => 'Jorge Díaz',
-                'description' => 'Actualizó la información de su perfil',
-                'status'      => 'Activo',
-                'date'        => now()->subDays(2)->format('d/m/Y H:i'),
-            ],
-        ];
+        abort_unless($usuarioActual instanceof \App\Models\Usuario, 403);
 
-        $chartData = [
-            'months'         => ['Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'],
-            'sales'          => [320, 410, 380, 512, 460, 590],
-            'users'          => [120, 190, 150, 260, 210, 300],
-            'categoryLabels' => ['Electrónica', 'Ropa', 'Hogar', 'Deportes', 'Otros'],
-            'categoryValues' => [38, 24, 18, 12, 8],
-        ];
+        $rolActual = $usuarioActual->roles()->first()?->name;
 
-        return view('dashboard.index', compact(
-            'totalUsers',
-            'totalProducts',
-            'totalSales',
-            'totalRevenue',
-            'recentActivity',
-            'chartData'
-        ));
+        // Mostrar el dashboard correspondiente según el rol
+        switch ($rolActual) {
+            case 'administrador':
+
+                // Total de mascotas registradas
+                $totalMascotas = $this->dash_service->TotalMascotas();
+
+                // Total de usuarios registrados
+                $totalUsuarios = $this->dash_service->TotalUsuarios();
+
+                // Citas programadas para hoy
+                $citasHoy = $this->dash_service->TotalCitasHoy();
+
+                // Total de citas del mes
+                $totalCitasMes = $this->dash_service->TotalCitasMes();
+
+                // Citas de hoy
+                $citasDelDia = $this->dash_service->CitasDelDia();
+
+                // Próximas citas
+                $proximasCitas = $this->dash_service->ProximasCitas();
+
+                // Citas por mes
+                $datosCitasPorMes = $this->dash_service->CitasPorMes();
+
+                // Servicios más solicitados
+                $serviciosMasSolicitados = $this->dash_service->ServiciosMasSolicitados();
+
+                return view('dashboard.index', compact(
+                    'totalMascotas',
+                    'totalUsuarios',
+                    'citasHoy',
+                    'totalCitasMes',
+                    'citasDelDia',
+                    'proximasCitas',
+                    'datosCitasPorMes',
+                    'serviciosMasSolicitados'
+                ));
+
+            case 'veterinario':
+
+                // Identificar el veterinario relacionado con el usuario
+                $veterinario = Veterinario::where(
+                    'documentoIdentidad',
+                    $usuarioActual->documentoIdentidad
+                )->firstOrFail();
+
+                // Especialidad del veterinario
+                $especialidad = $veterinario->especialidad;
+
+                // Historias clínicas pendientes por completar
+                $historiasPendientes = $this->dash_service
+                    ->TotalHistoriasPendientesVeterinario();
+
+                // Listado de máximo 5 historias pendientes
+                $listadoHistoriasPendientes = $this->dash_service
+                    ->HistoriasPendientesVeterinario();
+
+                // Actividad del veterinario
+                $actividadVeterinario = $this->dash_service
+                    ->CitasPorEstadoVeterinario($veterinario->id);
+
+                // Citas de hoy
+                $citasHoy = $this->dash_service
+                    ->CitasHoyVeterinario($veterinario->id);
+
+                // Citas del mes
+                $totalCitasMes = $this->dash_service
+                    ->CitasMesVeterinario($veterinario->id);
+
+                return view('dashboard.veterinario', compact(
+                    'veterinario',
+                    'especialidad',
+                    'historiasPendientes',
+                    'listadoHistoriasPendientes',
+                    'actividadVeterinario',
+                    'citasHoy',
+                    'totalCitasMes'
+                ));
+                
+            case 'usuario':
+
+            $idUsuario = $usuarioActual->id;
+
+            $mascotas = $this->dash_service->MascotasUsuario($idUsuario);
+
+            $proximasCitas = $this->dash_service->ProximasCitasUsuario($idUsuario);
+
+            $serviciosRecibidos = $this->dash_service->ServiciosRecibidosUsuario($idUsuario);
+
+            $totalMascotas = $this->dash_service->TotalMascotasUsuario($idUsuario);
+
+            $totalProximasCitas = $this->dash_service->TotalProximasCitasUsuario($idUsuario);
+
+            $totalHistorias = $this->dash_service->TotalHistoriasUsuario($idUsuario);
+
+            $totalServiciosRecibidos = $this->dash_service->TotalServiciosRecibidosUsuario($idUsuario);
+
+            return view('dashboard.usuario', compact(
+                'usuarioActual',
+                'mascotas',
+                'proximasCitas',
+                'serviciosRecibidos',
+                'totalMascotas',
+                'totalProximasCitas',
+                'totalHistorias',
+                'totalServiciosRecibidos'
+            ));
+    
+            default:
+                abort(403, 'No tienes un rol válido para acceder al dashboard.');
+        }
     }
+
 }
